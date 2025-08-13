@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight } from "lucide-react";
 
@@ -28,8 +28,26 @@ function useAuth() {
   return { token, setToken, isAuthed, headers };
 }
 
+// Global scroll reveal + page change refresh
+function useScrollAnimations() {
+  const location = useLocation();
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal, .slide-left, .slide-right');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [location.pathname]);
+}
+
 // -------------- Layout --------------
 function Shell({ children }){
+  useScrollAnimations();
   return (
     <div className="App">
       <nav className="nav">
@@ -61,13 +79,24 @@ function Shell({ children }){
 
 // -------------- Pages --------------
 function Home(){
+  const [heroY, setHeroY] = useState(0);
+  useEffect(() => {
+    let raf;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setHeroY(window.scrollY * 0.08));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+  }, []);
+
   return (
     <Shell>
-      <section className="hero" style={{backgroundImage:`url(${HERO_BG})`, backgroundSize:'cover', backgroundPosition:'center'}}>
+      <section className="hero" style={{backgroundImage:`url(${HERO_BG})`, backgroundSize:'cover', backgroundPosition:`center calc(50% + ${heroY}px)`}}>
         <div className="hero-wrap container">
-          <div>
-            <h1 className="h-title reveal">Making Top Quality Trucks & Trailers</h1>
-            <p className="h-sub reveal">Flatbeds, drop decks, control vans, towable screens and custom builds. Built for Canadian conditions with precision fabrication.</p>
+          <div className="reveal">
+            <h1 className="h-title">Making Top Quality Trucks & Trailers</h1>
+            <p className="h-sub">Flatbeds, drop decks, control vans, towable screens and custom builds. Built for Canadian conditions with precision fabrication.</p>
             <div className="cta">
               <Link className="btn" to="/products">Browse Products</Link>
               <Link className="btn secondary" to="/custom">Custom Builds</Link>
@@ -81,12 +110,12 @@ function Home(){
         </div>
       </section>
 
-      <section className="container">
+      <section className="container reveal">
         <h3>Featured Builds</h3>
         <p className="h-sub">A glimpse at the range — from road-ready flatbeds to specialty control vans.</p>
         <div className="featured-list">
           {USER_FEATURED.map((it, i) => (
-            <div key={it.key} className="featured-row">
+            <div key={it.key} className={`featured-row ${i % 2 === 0 ? 'slide-left' : 'slide-right'}`}>
               {i % 2 === 0 ? (
                 <>
                   <div className="featured-media"><img src={it.src} alt={it.title}/></div>
@@ -111,35 +140,35 @@ function Home(){
         </div>
       </section>
 
-      <section className="container">
+      <section className="container reveal">
         <h3>What We Build</h3>
         <div className="grid" style={{marginTop:12}}>
-          <Link className="card" to="/flatbeds"><h4>Flatbeds</h4><p>Multi-length options with secure tie-downs and durable decks.</p></Link>
-          <Link className="card" to="/drop-decks"><h4>Drop Decks</h4><p>Lower deck height for easy loading and improved stability.</p></Link>
-          <Link className="card" to="/control-vans"><h4>Control Vans</h4><p>Operator-ready cabins with power, access, and visibility.</p></Link>
+          <Link className="card reveal" to="/flatbeds"><h4>Flatbeds</h4><p>Multi-length options with secure tie-downs and durable decks.</p></Link>
+          <Link className="card reveal" to="/drop-decks"><h4>Drop Decks</h4><p>Lower deck height for easy loading and improved stability.</p></Link>
+          <Link className="card reveal" to="/control-vans"><h4>Control Vans</h4><p>Operator-ready cabins with power, access, and visibility.</p></Link>
         </div>
       </section>
 
-      <section className="container">
+      <section className="container reveal">
         <h3>Why Phoenix</h3>
         <div className="features">
-          <div className="feature"><div className="icon"><ShieldCheck size={20}/></div><h4>Built to Last</h4><p className="h-sub">Industrial-grade materials, quality welds, and rigorous QA.</p></div>
-          <div className="feature"><div className="icon"><Wrench size={20}/></div><h4>Custom Fabrication</h4><p className="h-sub">Tailored solutions for your application and region.</p></div>
-          <div className="feature"><div className="icon"><Factory size={20}/></div><h4>Canadian Made</h4><p className="h-sub">Designed and manufactured for Canadian conditions.</p></div>
-          <div className="feature"><div className="icon"><Truck size={20}/></div><h4>Fast Turnarounds</h4><p className="h-sub">Responsive builds with dependable delivery.</p></div>
+          <div className="feature reveal"><div className="icon"><ShieldCheck size={20}/></div><h4>Built to Last</h4><p className="h-sub">Industrial-grade materials, quality welds, and rigorous QA.</p></div>
+          <div className="feature reveal"><div className="icon"><Wrench size={20}/></div><h4>Custom Fabrication</h4><p className="h-sub">Tailored solutions for your application and region.</p></div>
+          <div className="feature reveal"><div className="icon"><Factory size={20}/></div><h4>Canadian Made</h4><p className="h-sub">Designed and manufactured for Canadian conditions.</p></div>
+          <div className="feature reveal"><div className="icon"><Truck size={20}/></div><h4>Fast Turnarounds</h4><p className="h-sub">Responsive builds with dependable delivery.</p></div>
         </div>
       </section>
 
-      <section className="container">
+      <section className="container reveal">
         <h3>Our Locations</h3>
         <div className="grid" style={{marginTop:12}}>
-          <div className="card"><h4>Calgary</h4><p className="h-sub"><MapPin size={14}/> Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</p><p><Mail size={14}/> seanm@rpmtrailer.ca • <Phone size={14}/> (403) 837-1322</p></div>
-          <div className="card"><h4>Rocky View</h4><p className="h-sub"><MapPin size={14}/> 28515 Kleysen Way, Rocky View, AB, T1X 0K1</p><p><Mail size={14}/> paulm@rpmtrailer.ca • <Phone size={14}/> (403) 819-5516</p></div>
-          <Link to="/dealers" className="card" style={{display:'flex', alignItems:'center', justifyContent:'center'}}><h4>View all dealers →</h4></Link>
+          <div className="card reveal"><h4>Calgary</h4><p className="h-sub"><MapPin size={14}/> Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</p><p><Mail size={14}/> seanm@rpmtrailer.ca • <Phone size={14}/> (403) 837-1322</p></div>
+          <div className="card reveal"><h4>Rocky View</h4><p className="h-sub"><MapPin size={14}/> 28515 Kleysen Way, Rocky View, AB, T1X 0K1</p><p><Mail size={14}/> paulm@rpmtrailer.ca • <Phone size={14}/> (403) 819-5516</p></div>
+          <Link to="/dealers" className="card reveal" style={{display:'flex', alignItems:'center', justifyContent:'center'}}><h4>View all dealers →</h4></Link>
         </div>
       </section>
 
-      <section className="container">
+      <section className="container reveal">
         <div className="form" style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:12}}>
           <div>
             <h3>Have a build in mind?</h3>
@@ -184,7 +213,7 @@ function Products(){
 function ProductCard({p}){
   const nav = useNavigate();
   return (
-    <div className="card" onClick={()=>nav(`/products/${p.id}`)} style={{cursor:'pointer'}}>
+    <div className="card reveal" onClick={()=>nav(`/products/${p.id}`)} style={{cursor:'pointer'}}>
       {p.images?.[0] && <img src={p.images[0]} alt={p.title}/>}<h4>{p.title}</h4>
       <p>{p.description}</p>
     </div>
@@ -202,13 +231,13 @@ function ProductDetail(){
   return (
     <Shell>
       <div className="container">
-        <h2>{p.title}</h2>
+        <h2 className="reveal">{p.title}</h2>
         <div className="gallery" style={{marginTop:12}}>
-          {(p.images||[]).map((u,i)=> (<img key={i} src={u} alt={`${p.title} ${i+1}`} />))}
+          {(p.images||[]).map((u,i)=> (<img className="reveal" key={i} src={u} alt={`${p.title} ${i+1}`} />))}
         </div>
-        <p style={{marginTop:16}}>{p.description}</p>
+        <p style={{marginTop:16}} className="reveal">{p.description}</p>
         {auth.isAuthed && (
-          <div style={{marginTop:16, display:'flex', gap:12}}>
+          <div style={{marginTop:16, display:'flex', gap:12}} className="reveal">
             <Link className="btn secondary" to={`/products/${id}/edit`}>Edit</Link>
             <button className="btn" onClick={del}>Delete</button>
           </div>
@@ -230,8 +259,8 @@ function EditProduct(){
   return (
     <Shell>
       <div className="container" style={{maxWidth:720}}>
-        <h2>Edit Product</h2>
-        <form className="form" onSubmit={submit}>
+        <h2 className="reveal">Edit Product</h2>
+        <form className="form reveal" onSubmit={submit}>
           <div style={{display:'grid', gap:12}}>
             <label className="label">Title</label>
             <input className="input" value={title} onChange={e=>setTitle(e.target.value)} required />
@@ -267,8 +296,8 @@ function Login(){
   return (
     <Shell>
       <div className="container" style={{maxWidth:520}}>
-        <h2>{mode === "login" ? "Login" : "Register"}</h2>
-        <form className="form" onSubmit={submit}>
+        <h2 className="reveal">{mode === "login" ? "Login" : "Register"}</h2>
+        <form className="form reveal" onSubmit={submit}>
           <div style={{display:'grid', gap:12}}>
             <label className="label">Email</label>
             <input className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
@@ -302,11 +331,11 @@ function AddProduct(){
   return (
     <Shell>
       <div className="container" style={{maxWidth:720}}>
-        <h2>Add a Product</h2>
+        <h2 className="reveal">Add a Product</h2>
         {!auth.isAuthed && (
-          <p className="h-sub">You are not logged in. <Link to="/login">Login or register</Link> to add products.</p>
+          <p className="h-sub reveal">You are not logged in. <Link to="/login">Login or register</Link> to add products.</p>
         )}
-        <form className="form" onSubmit={submit}>
+        <form className="form reveal" onSubmit={submit}>
           <div style={{display:'grid', gap:12}}>
             <label className="label">Title</label>
             <input className="input" value={title} onChange={e=>setTitle(e.target.value)} required />
@@ -328,12 +357,12 @@ function AddProduct(){
 // ---- Content Pages (Phase 3) ----
 function Section({title, lead, images=[]}){
   return (
-    <div className="section container">
+    <div className="section container reveal">
       <h2>{title}</h2>
       {lead && <p className="lead">{lead}</p>}
       {images.length>0 && (
         <div className="gallery">
-          {images.map((u,i)=>(<img key={i} src={u} alt={`${title} ${i+1}`} />))}
+          {images.map((u,i)=>(<img className="reveal" key={i} src={u} alt={`${title} ${i+1}`} />))}
         </div>
       )}
     </div>
@@ -389,12 +418,12 @@ function CustomBuilds(){
       <Section title="Custom Trailer Designs" lead="Whatever you need, we make it happen" images={imgs}/>
       <div className="container" style={{marginTop:-16}}>
         <div className="features">
-          <div className="feature"><div className="icon"><Sparkles size={20}/></div><h4>Concept to Delivery</h4><p className="h-sub">Share your brief—our team designs, fabricates and finishes.</p></div>
-          <div className="feature"><div className="icon"><Wrench size={20}/></div><h4>Specification Options</h4><p className="h-sub">Deck sizes, materials, power, access, tie-downs, paint and more.</p></div>
-          <div className="feature"><div className="icon"><ShieldCheck size={20}/></div><h4>Compliance</h4><p className="h-sub">Built to safety standards and field‑tested.</p></div>
-          <div className="feature"><div className="icon"><Truck size={20}/></div><h4>Deployment Ready</h4><p className="h-sub">Delivered ready for work with documentation.</p></div>
+          <div className="feature reveal"><div className="icon"><Sparkles size={20}/></div><h4>Concept to Delivery</h4><p className="h-sub">Share your brief—our team designs, fabricates and finishes.</p></div>
+          <div className="feature reveal"><div className="icon"><Wrench size={20}/></div><h4>Specification Options</h4><p className="h-sub">Deck sizes, materials, power, access, tie-downs, paint and more.</p></div>
+          <div className="feature reveal"><div className="icon"><ShieldCheck size={20}/></div><h4>Compliance</h4><p className="h-sub">Built to safety standards and field‑tested.</p></div>
+          <div className="feature reveal"><div className="icon"><Truck size={20}/></div><h4>Deployment Ready</h4><p className="h-sub">Delivered ready for work with documentation.</p></div>
         </div>
-        <div className="form" style={{marginTop:16, display:'flex', justifyContent:'space-between', gap:12}}>
+        <div className="form reveal" style={{marginTop:16, display:'flex', justifyContent:'space-between', gap:12}}>
           <div>
             <h3>Start a custom build</h3>
             <p className="h-sub">Email <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a> or call (403) 837‑1322</p>
@@ -409,10 +438,10 @@ function CustomBuilds(){
 function About(){
   return (
     <Shell>
-      <div className="section container">
+      <div className="section container reveal">
         <h2>Serving Canadians Since 2020</h2>
         <p className="lead">Founded in 2020, Phoenix Manufacturing is a proudly Canadian-owned company stemming from RPM Truck & Trailer Repair (est. 1991). We design and build specialized trailer solutions with craftsmanship and customer focus.</p>
-        <img style={{width:'100%', borderRadius:12, marginTop:12}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_4786.jpg?fit=640%2C480&ssl=1" alt="Shop"/>
+        <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:12}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_4786.jpg?fit=640%2C480&ssl=1" alt="Shop"/>
         <h3 style={{marginTop:20}}>Our Team</h3>
         <ul style={{marginTop:8, color:'var(--muted)'}}>
           <li>Sean McCormick — Co-Founder, CEO</li>
@@ -428,11 +457,11 @@ function About(){
 function Contact(){
   return (
     <Shell>
-      <div className="section container">
+      <div className="section container reveal">
         <h2>Contact Us</h2>
         <p className="lead">Whether you’re looking for more information or a quote, we’d love to hear from you.</p>
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
-          <div className="form">
+          <div className="form reveal">
             <div style={{display:'grid', gap:12}}>
               <div><div className="label">Address</div> Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</div>
               <div><div className="label">Hours</div> Mon–Fri 9:00AM – 5:00PM</div>
@@ -440,7 +469,7 @@ function Contact(){
               <div><div className="label">Email</div> <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a></div>
             </div>
           </div>
-          <div className="form">
+          <div className="form reveal">
             <div className="label">Quick Note</div>
             <p className="h-sub">This form is static in the MVP. Use the email or phone to reach us.</p>
           </div>
@@ -453,20 +482,20 @@ function Contact(){
 function Dealers(){
   return (
     <Shell>
-      <div className="section container">
+      <div className="section container reveal">
         <h2>Our Dealers</h2>
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
-          <div className="form">
+          <div className="form reveal">
             <h3>Calgary</h3>
             <p className="lead">Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</p>
             <p>Email: <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a> | Phone: (403) 837-1322</p>
-            <img style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/Screenshot-2024-10-24-115800.png?fit=596%2C303&ssl=1" alt="Calgary map"/>
+            <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/Screenshot-2024-10-24-115800.png?fit=596%2C303&ssl=1" alt="Calgary map"/>
           </div>
-          <div className="form">
+          <div className="form reveal">
             <h3>Rocky View</h3>
             <p className="lead">RPM Trailer Repair Services Lt. — 28515 Kleysen Way, Rocky View, AB, T1X 0K1</p>
             <p>Email: <a href="mailto:paulm@rpmtrailer.ca">paulm@rpmtrailer.ca</a> | Phone: (403) 819-5516</p>
-            <img style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/05/IMG_20200718_111136.jpg?fit=680%2C340&ssl=1" alt="Rocky View"/>
+            <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/05/IMG_20200718_111136.jpg?fit=680%2C340&ssl=1" alt="Rocky View"/>
           </div>
         </div>
       </div>
