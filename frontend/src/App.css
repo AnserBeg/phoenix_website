@@ -19,18 +19,22 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 
 /* Header */
 .nav{position:sticky; top:0; z-index:50; backdrop-filter: blur(12px); background:rgba(255,255,255,0.9); border-bottom:1px solid var(--border)}
-.nav-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 24px}
-.logo{display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:0.5px; color:var(--text)}
-.logo-badge{width:12px; height:12px; border-radius:999px; background:var(--brand); box-shadow:0 0 0 4px rgba(255,122,0,0.15)}
-.nav a{color:var(--text); text-decoration:none; margin:0 12px; font-weight:600}
+.nav-inner{display:flex; align-items:center; justify-content:space-between; padding:12px 24px; gap:12px}
+.logo{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:0.2px; color:var(--text)}
+.logo-img{height:28px; width:auto; display:block}
+.logo-badge{display:none}
+.nav-links{display:flex; align-items:center; gap:12px; white-space:nowrap; overflow-x:auto; padding-bottom:4px}
+.nav-links::-webkit-scrollbar{height:6px}
+.nav-links::-webkit-scrollbar-thumb{background:#e5e7eb; border-radius:999px}
+.nav a{color:var(--text); text-decoration:none; padding:6px 8px; font-weight:600}
 .nav a:hover{color:var(--brand)}
 
 /* Hero with background image overlay (kept dark for contrast) */
 .hero{position:relative; overflow:hidden;}
 .hero::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(13,14,16,0.75), rgba(13,14,16,0.65)); z-index:0}
-.hero-wrap{position:relative; z-index:1; padding:96px 24px; display:grid; grid-template-columns:1.1fr 0.9fr; gap:32px; align-items:center}
+.hero-wrap{position:relative; z-index:1; padding:96px 24px; display:grid; grid-template-columns:1fr; gap:24px; align-items:center}
 .h-title{font-size:52px; line-height:1.05; font-weight:800; letter-spacing:-0.02em}
-.h-sub{margin-top:16px; color:rgba(255,255,255,0.8); max-width:58ch}
+.h-sub{margin-top:16px; color:rgba(255,255,255,0.9); max-width:68ch}
 .hero .h-title{color:#fff}
 .hero .cta .btn.secondary{background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.5)}
 
@@ -91,7 +95,6 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
   .featured-media img{height:360px}
 }
 @media (max-width: 960px){
-  .hero-wrap{grid-template-columns:1fr;}
   .grid{grid-template-columns:1fr 1fr}
   .gallery{grid-template-columns:1fr 1fr}
   .features{grid-template-columns:1fr 1fr}

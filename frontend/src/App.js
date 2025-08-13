@@ -7,6 +7,7 @@ import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, Arr
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // Never hardcode
 const API = `${BACKEND_URL}/api`;
 const HERO_BG = "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/gc2m0gcr_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2008_22_08%20PM.png";
+const LOGO = "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/k8r8d71w_Phoenix%20Logo%20Full%20Transparent.svg";
 
 // User-provided featured images
 const USER_FEATURED = [
@@ -53,10 +54,10 @@ function Shell({ children }){
       <nav className="nav">
         <div className="nav-inner">
           <div className="logo">
-            <span className="logo-badge" />
+            <img className="logo-img" src={LOGO} alt="Phoenix Trailers" />
             <Link to="/">Phoenix Trailers</Link>
           </div>
-          <div>
+          <div className="nav-links">
             <Link to="/products">Products</Link>
             <Link to="/flatbeds">Flatbeds</Link>
             <Link to="/drop-decks">Drop Decks</Link>
@@ -94,7 +95,7 @@ function Home(){
     <Shell>
       <section className="hero" style={{backgroundImage:`url(${HERO_BG})`, backgroundSize:'cover', backgroundPosition:`center calc(50% + ${heroY}px)`}}>
         <div className="hero-wrap container">
-          <div className="reveal">
+          <div className="reveal" style={{maxWidth:860}}>
             <h1 className="h-title">Making Top Quality Trucks & Trailers</h1>
             <p className="h-sub">Flatbeds, drop decks, control vans, towable screens and custom builds. Built for Canadian conditions with precision fabrication.</p>
             <div className="cta">
@@ -102,17 +103,12 @@ function Home(){
               <Link className="btn secondary" to="/custom">Custom Builds</Link>
             </div>
           </div>
-          <div className="grid">
-            {USER_FEATURED.slice(0,3).map((it,i)=> (
-              <ImgCard key={i} title={it.title} src={it.src}/>
-            ))}
-          </div>
         </div>
       </section>
 
       <section className="container reveal">
         <h3>Featured Builds</h3>
-        <p className="h-sub">A glimpse at the range — from road-ready flatbeds to specialty control vans.</p>
+        <p className="h-sub" style={{color:'var(--muted)'}}>A glimpse at the range — from road-ready flatbeds to specialty control vans.</p>
         <div className="featured-list">
           {USER_FEATURED.map((it, i) => (
             <div key={it.key} className={`featured-row ${i % 2 === 0 ? 'slide-left' : 'slide-right'}`}>
@@ -354,7 +350,7 @@ function AddProduct(){
   );
 }
 
-// ---- Content Pages (Phase 3) ----
+// ---- Content Pages ----
 function Section({title, lead, images=[]}){
   return (
     <div className="section container reveal">
