@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from pymongo import ReturnDocument
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -47,18 +48,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
-async def get_current_user(token: str = None):
-    if token is None:
-        # also support Authorization: Bearer token via header when using Depends in routes later if needed
-        from fastapi import Request
-        def extractor(request: Request):
-            auth = request.headers.get("Authorization")
-            if auth and auth.lower().startswith("bearer "):
-                return auth.split(" ", 1)[1]
-            return None
-        return extractor
 
 
 # ------------------ Models ------------------
@@ -170,6 +159,14 @@ async def list_products():
     return [Product(**doc) for doc in docs]
 
 
+@api_router.get("/products/{product_id}", response_model=Product)
+async def get_product(product_id: str):
+    doc = await db.products.find_one({"id": product_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return Product(**doc)
+
+
 @api_router.post("/products", response_model=Product)
 async def create_product(product: ProductCreate, user=Depends(require_auth)):
     prod = Product(**product.dict())
@@ -181,7 +178,9 @@ async def create_product(product: ProductCreate, user=Depends(require_auth)):
 async def update_product(product_id: str, product: ProductCreate, user=Depends(require_auth)):
     now = datetime.utcnow()
     update_doc = {**product.dict(), "updated_at": now}
-    result = await db.products.find_one_and_update({"id": product_id}, {"$set": update_doc}, return_document=True)
+    result = await db.products.find_one_and_update(
+        {"id": product_id}, {"$set": update_doc}, return_document=ReturnDocument.AFTER
+    )
     if not result:
         raise HTTPException(status_code=404, detail="Product not found")
     return Product(**result)

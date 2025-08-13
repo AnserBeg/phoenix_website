@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // Never hardcode
 const API = `${BACKEND_URL}/api`;
+const HERO_BG = "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/gc2m0gcr_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2008_22_08%20PM.png";
 
 // -------------- Reusable helpers --------------
 const api = axios.create({ baseURL: API });
@@ -29,13 +30,20 @@ function Shell({ children }){
           </div>
           <div>
             <Link to="/products">Products</Link>
+            <Link to="/flatbeds">Flatbeds</Link>
+            <Link to="/drop-decks">Drop Decks</Link>
+            <Link to="/truck-decks">Truck Decks</Link>
+            <Link to="/control-vans">Control Vans</Link>
+            <Link to="/dealers">Dealers</Link>
+            <Link to="/about">About</Link>
+            <Link to="/contact">Contact</Link>
             <Link to="/add">Add Product</Link>
             <Link to="/login">Login</Link>
           </div>
         </div>
       </nav>
       {children}
-      <footer className="footer container">© {new Date().getFullYear()} Phoenix Trailer Manufacturing</footer>
+      <footer className="footer container">© {new Date().getFullYear()} Phoenix Trailer Manufacturing — Calgary, AB</footer>
     </div>
   );
 }
@@ -44,20 +52,20 @@ function Shell({ children }){
 function Home(){
   return (
     <Shell>
-      <section className="hero">
+      <section className="hero" style={{backgroundImage:`url(${HERO_BG})`, backgroundSize:'cover', backgroundPosition:'center'}}>
         <div className="hero-wrap container">
           <div>
             <h1 className="h-title reveal">Making Top Quality Trucks & Trailers</h1>
-            <p className="h-sub reveal">Heavy-duty flatbeds, drop decks, control vans and custom builds. Built for Canadian conditions with precision fabrication.</p>
+            <p className="h-sub reveal">Flatbeds, drop decks, control vans and custom builds. Built for Canadian conditions with precision fabrication.</p>
             <div className="cta">
               <Link className="btn" to="/products">Browse Products</Link>
               <a className="btn secondary" href="https://phoenixtrailers.ca/contact-us-2/" target="_blank" rel="noreferrer">Contact Us</a>
             </div>
           </div>
           <div className="grid">
-            <ImgCard title="Flatbeds" src="https://customer-assets.emergentagent.com/job_4d2a710e-d2a0-4ceb-9831-16c58e3b2668/artifacts/9ar8tgdj_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_57_19%20PM.png"/>
-            <ImgCard title="Control Vans" src="https://customer-assets.emergentagent.com/job_4d2a710e-d2a0-4ceb-9831-16c58e3b2668/artifacts/rb7u0yjd_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_59%20PM.png"/>
-            <ImgCard title="Utility Trailers" src="https://customer-assets.emergentagent.com/job_4d2a710e-d2a0-4ceb-9831-16c58e3b2668/artifacts/6fec4x5g_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_52_01%20PM.png"/>
+            <ImgCard title="Flatbeds" src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5050.jpg?fit=1024%2C768&ssl=1"/>
+            <ImgCard title="Drop Decks" src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_0985.jpg?fit=640%2C480&ssl=1"/>
+            <ImgCard title="Control Vans" src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5132-1.jpg?fit=768%2C576&ssl=1"/>
           </div>
         </div>
       </section>
@@ -79,6 +87,7 @@ function ImgCard({title, src}){
   )
 }
 
+// ---- Products ----
 function Products(){
   const [items, setItems] = useState([]);
   useEffect(() => { (async () => {
@@ -89,15 +98,81 @@ function Products(){
         <h2>Products</h2>
         <div className="grid" style={{marginTop:16}}>
           {items.map(p => (
-            <div key={p.id} className="card">
-              {p.images?.[0] && <img src={p.images[0]} alt={p.title}/>}<h4>{p.title}</h4>
-              <p>{p.description}</p>
-            </div>
+            <ProductCard key={p.id} p={p} />
           ))}
         </div>
       </div>
     </Shell>
   );
+}
+
+function ProductCard({p}){
+  const nav = useNavigate();
+  return (
+    <div className="card" onClick={()=>nav(`/products/${p.id}`)} style={{cursor:'pointer'}}>
+      {p.images?.[0] && <img src={p.images[0]} alt={p.title}/>}<h4>{p.title}</h4>
+      <p>{p.description}</p>
+    </div>
+  )
+}
+
+function ProductDetail(){
+  const {id} = useParams();
+  const [p, setP] = useState(null);
+  const auth = useAuth();
+  const nav = useNavigate();
+  useEffect(()=>{ (async()=>{ try{ const {data}=await api.get(`/products/${id}`); setP(data);}catch(e){ console.error(e);} })(); },[id]);
+  const del = async ()=>{ if(!window.confirm("Delete this product?")) return; try{ await api.delete(`/products/${id}`, {headers: auth.headers}); nav('/products'); }catch(e){ alert('Delete failed'); }}
+  if(!p) return <Shell><div className="container"><p>Loading...</p></div></Shell>
+  return (
+    <Shell>
+      <div className="container">
+        <h2>{p.title}</h2>
+        <div className="gallery" style={{marginTop:12}}>
+          {(p.images||[]).map((u,i)=> (<img key={i} src={u} alt={`${p.title} ${i+1}`} />))}
+        </div>
+        <p style={{marginTop:16}}>{p.description}</p>
+        {auth.isAuthed && (
+          <div style={{marginTop:16, display:'flex', gap:12}}>
+            <Link className="btn secondary" to={`/products/${id}/edit`}>Edit</Link>
+            <button className="btn" onClick={del}>Delete</button>
+          </div>
+        )}
+      </div>
+    </Shell>
+  )
+}
+
+function EditProduct(){
+  const {id} = useParams();
+  const auth = useAuth();
+  const nav = useNavigate();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [images, setImages] = useState([""]);
+  useEffect(()=>{ (async()=>{ try{ const {data}=await api.get(`/products/${id}`); setTitle(data.title); setDescription(data.description); setImages(data.images?.length?data.images:[""]); }catch(e){ console.error(e);} })(); },[id]);
+  const submit = async (e)=>{ e.preventDefault(); try{ await api.put(`/products/${id}`, {title, description, images: images.filter(Boolean)}, {headers: auth.headers}); nav(`/products/${id}`);}catch(e){ alert('Update failed'); }}
+  return (
+    <Shell>
+      <div className="container" style={{maxWidth:720}}>
+        <h2>Edit Product</h2>
+        <form className="form" onSubmit={submit}>
+          <div style={{display:'grid', gap:12}}>
+            <label className="label">Title</label>
+            <input className="input" value={title} onChange={e=>setTitle(e.target.value)} required />
+            <label className="label">Description</label>
+            <textarea className="input" rows={5} value={description} onChange={e=>setDescription(e.target.value)} required />
+            <label className="label">Image URLs</label>
+            {images.map((url, i) => (
+              <input key={i} className="input" value={url} onChange={e=>setImages(prev=> prev.map((v,idx)=> idx===i?e.target.value:v))} />
+            ))}
+            <button type="button" className="btn secondary" onClick={()=>setImages([...images, ""]) }>Add another image</button>
+            <button className="btn" type="submit">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </Shell>
+  )
 }
 
 function Login(){
@@ -139,19 +214,16 @@ function AddProduct(){
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([""]);
-
   const addField = () => setImages([...images, ""]);
   const updateImg = (i, val) => setImages(prev => prev.map((v,idx)=> idx===i?val:v));
-
   const submit = async (e) => {
     e.preventDefault();
     try{
       const payload = {title, description, images: images.filter(Boolean)};
-      const {data} = await api.post("/products", payload, {headers: auth.headers});
+      await api.post("/products", payload, {headers: auth.headers});
       nav(`/products`);
     }catch(err){ alert("Failed to create product. Are you logged in?"); console.error(err); }
   }
-
   return (
     <Shell>
       <div className="container" style={{maxWidth:720}}>
@@ -178,6 +250,124 @@ function AddProduct(){
   );
 }
 
+// ---- Content Pages (Phase 3) ----
+function Section({title, lead, images=[]}){
+  return (
+    <div className="section container">
+      <h2>{title}</h2>
+      {lead && <p className="lead">{lead}</p>}
+      {images.length>0 && (
+        <div className="gallery">
+          {images.map((u,i)=>(<img key={i} src={u} alt={`${title} ${i+1}`} />))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Flatbeds(){
+  const imgs=[
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5050.jpg?fit=1024%2C768&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5053.jpg?fit=1024%2C768&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5055.jpg?fit=1024%2C768&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5052.jpg?fit=1024%2C768&ssl=1",
+  ];
+  return <Shell><Section title="Flatbeds" lead="Drive efficiently and securely with our flatbeds" images={imgs}/></Shell>
+}
+function DropDecks(){
+  const imgs=[
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_0985.jpg?fit=640%2C480&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_4049-1.jpg?fit=640%2C480&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_2771.jpg?fit=640%2C480&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_2772-1.jpg?fit=640%2C480&ssl=1",
+  ];
+  return <Shell><Section title="Drop Decks" lead="High-performance drop decks for easy loading and maximum stability" images={imgs}/></Shell>
+}
+function TruckDecks(){
+  const imgs=[
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5062.jpg?fit=1024%2C768&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5067.jpg?fit=1024%2C768&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5068.jpg?fit=1024%2C768&ssl=1",
+  ];
+  return <Shell><Section title="Truck Decks" lead="Truck decks designed for heavy-duty hauling and seamless integration" images={imgs}/></Shell>
+}
+function ControlVans(){
+  const imgs=[
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5132-1.jpg?fit=768%2C576&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5134-1.jpg?fit=768%2C576&ssl=1",
+    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5136.jpg?fit=768%2C576&ssl=1",
+  ];
+  return <Shell><Section title="Control Vans" lead="Control vans equipped for optimal operation and versatility" images={imgs}/></Shell>
+}
+
+function About(){
+  return (
+    <Shell>
+      <div className="section container">
+        <h2>Serving Canadians Since 2020</h2>
+        <p className="lead">Founded in 2020, Phoenix Manufacturing is a proudly Canadian-owned company stemming from RPM Truck & Trailer Repair (est. 1991). We design and build specialized trailer solutions with craftsmanship and customer focus.</p>
+        <img style={{width:'100%', borderRadius:12, marginTop:12}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_4786.jpg?fit=640%2C480&ssl=1" alt="Shop"/>
+        <h3 style={{marginTop:20}}>Our Team</h3>
+        <ul style={{marginTop:8, color:'var(--muted)'}}>
+          <li>Sean McCormick — Co-Founder, CEO</li>
+          <li>Paul McCormick — Co-Founder</li>
+          <li>Azhar Nizam — Accountant</li>
+          <li>Sales — Coming Soon</li>
+        </ul>
+      </div>
+    </Shell>
+  )
+}
+
+function Contact(){
+  return (
+    <Shell>
+      <div className="section container">
+        <h2>Contact Us</h2>
+        <p className="lead">Whether you’re looking for more information or a quote, we’d love to hear from you.</p>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
+          <div className="form">
+            <div style={{display:'grid', gap:12}}>
+              <div><div className="label">Address</div> Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</div>
+              <div><div className="label">Hours</div> Mon–Fri 9:00AM – 5:00PM</div>
+              <div><div className="label">Phone</div> 403-837-1322</div>
+              <div><div className="label">Email</div> <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a></div>
+            </div>
+          </div>
+          <div className="form">
+            <div className="label">Quick Note</div>
+            <p className="h-sub">This form is static in the MVP. Use the email or phone to reach us.</p>
+          </div>
+        </div>
+      </div>
+    </Shell>
+  )
+}
+
+function Dealers(){
+  return (
+    <Shell>
+      <div className="section container">
+        <h2>Our Dealers</h2>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
+          <div className="form">
+            <h3>Calgary</h3>
+            <p className="lead">Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</p>
+            <p>Email: <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a> | Phone: (403) 837-1322</p>
+            <img style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/Screenshot-2024-10-24-115800.png?fit=596%2C303&ssl=1" alt="Calgary map"/>
+          </div>
+          <div className="form">
+            <h3>Rocky View</h3>
+            <p className="lead">RPM Trailer Repair Services Lt. — 28515 Kleysen Way, Rocky View, AB, T1X 0K1</p>
+            <p>Email: <a href="mailto:paulm@rpmtrailer.ca">paulm@rpmtrailer.ca</a> | Phone: (403) 819-5516</p>
+            <img style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/05/IMG_20200718_111136.jpg?fit=680%2C340&ssl=1" alt="Rocky View"/>
+          </div>
+        </div>
+      </div>
+    </Shell>
+  )
+}
+
 function App(){
   // warm the API connection for nice first impression
   useEffect(()=>{ api.get("/").catch(()=>{}); },[]);
@@ -186,8 +376,17 @@ function App(){
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/products" element={<Products/>} />
+        <Route path="/products/:id" element={<ProductDetail/>} />
+        <Route path="/products/:id/edit" element={<EditProduct/>} />
         <Route path="/login" element={<Login/>} />
         <Route path="/add" element={<AddProduct/>} />
+        <Route path="/flatbeds" element={<Flatbeds/>} />
+        <Route path="/drop-decks" element={<DropDecks/>} />
+        <Route path="/truck-decks" element={<TruckDecks/>} />
+        <Route path="/control-vans" element={<ControlVans/>} />
+        <Route path="/about" element={<About/>} />
+        <Route path="/contact" element={<Contact/>} />
+        <Route path="/dealers" element={<Dealers/>} />
       </Routes>
     </BrowserRouter>
   );
