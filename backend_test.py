@@ -64,47 +64,12 @@ class PhoenixTrailersAPITester:
             self.log(f"❌ FAILED - {name} - Exception: {str(e)}")
             return False, {}
 
-    def test_api_health(self):
-        """Test 1: GET /api/ and assert JSON contains message: 'Phoenix Trailers API is running'"""
-        success, response = self.run_test(
-            "API Health Check",
-            "GET", 
-            "",
-            200
-        )
-        if success and response.get('message') == 'Phoenix Trailers API is running':
-            self.log("✅ API health message verified")
-            return True
-        else:
-            self.log(f"❌ API health message mismatch. Got: {response.get('message')}")
-            return False
-
-    def test_register(self):
-        """Test 2: POST /api/auth/register with test credentials"""
-        test_email = "test+phoenix@mvp.dev"
-        test_password = "test12345"
-        
-        success, response = self.run_test(
-            "User Registration",
-            "POST",
-            "auth/register",
-            200,
-            data={"email": test_email, "password": test_password}
-        )
-        
-        if success and 'access_token' in response:
-            self.token = response['access_token']
-            self.log(f"✅ Registration successful, token captured")
-            return True
-        else:
-            self.log("❌ Registration failed or no access_token in response")
-            return False
-
     def test_login(self):
-        """Test 3: POST /api/auth/login with same credentials"""
+        """Login with specified credentials: test+phoenix@mvp.dev / test12345"""
         test_email = "test+phoenix@mvp.dev"
         test_password = "test12345"
         
+        # Try login first
         success, response = self.run_test(
             "User Login",
             "POST",
@@ -114,29 +79,60 @@ class PhoenixTrailersAPITester:
         )
         
         if success and 'access_token' in response:
-            self.token = response['access_token']  # Update token
-            self.log(f"✅ Login successful, token updated")
+            self.token = response['access_token']
+            self.log(f"✅ Login successful, token captured")
             return True
         else:
-            self.log("❌ Login failed or no access_token in response")
+            # If login fails, try registration
+            self.log("Login failed, attempting registration...")
+            success, response = self.run_test(
+                "User Registration (fallback)",
+                "POST",
+                "auth/register",
+                200,
+                data={"email": test_email, "password": test_password}
+            )
+            
+            if success and 'access_token' in response:
+                self.token = response['access_token']
+                self.log(f"✅ Registration successful, token captured")
+                return True
+            else:
+                self.log("❌ Both login and registration failed")
+                return False
+
+    def test_get_products_list(self):
+        """Test 1: GET /api/products (should 200 list)"""
+        success, response = self.run_test(
+            "GET /api/products",
+            "GET",
+            "products",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            self.log(f"✅ Products list retrieved successfully, found {len(response)} products")
+            return True
+        else:
+            self.log("❌ Products list retrieval failed or invalid response format")
             return False
 
     def test_create_product(self):
-        """Test 4: POST /api/products with Authorization header"""
+        """Test 2: Create product via POST /api/products (after login) -> verify id"""
         if not self.token:
             self.log("❌ No token available for product creation")
             return False
             
         product_data = {
-            "title": "Tri-axle Drop Deck",
-            "description": "Heavy-duty steel deck with beavertail.",
-            "images": ["https://customer-assets.emergentagent.com/job_4d2a710e-d2a0-4ceb-9831-16c58e3b2668/artifacts/9ar8tgdj_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_57_19%20PM.png"]
+            "title": "Test Drop Deck",
+            "description": "Test product for API validation",
+            "images": ["https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_0985.jpg?fit=640%2C480&ssl=1"]
         }
         
         headers = {"Authorization": f"Bearer {self.token}"}
         
         success, response = self.run_test(
-            "Create Product",
+            "POST /api/products",
             "POST",
             "products",
             200,
@@ -152,63 +148,104 @@ class PhoenixTrailersAPITester:
             self.log("❌ Product creation failed or no ID in response")
             return False
 
-    def test_list_products(self):
-        """Test 5: GET /api/products and ensure created product appears"""
+    def test_get_product_by_id(self):
+        """Test 3: GET /api/products/{id} -> returns created product"""
+        if not self.created_product_id:
+            self.log("❌ No product ID available for retrieval test")
+            return False
+            
         success, response = self.run_test(
-            "List Products",
+            "GET /api/products/{id}",
             "GET",
-            "products",
+            f"products/{self.created_product_id}",
             200
         )
         
-        if success and isinstance(response, list):
-            self.log(f"✅ Products list retrieved, found {len(response)} products")
-            
-            # Check if our created product is in the list
-            if self.created_product_id:
-                found_product = None
-                for product in response:
-                    if product.get('id') == self.created_product_id:
-                        found_product = product
-                        break
-                
-                if found_product:
-                    self.log(f"✅ Created product found in list: {found_product.get('title')}")
-                    return True
-                else:
-                    self.log(f"❌ Created product with ID {self.created_product_id} not found in list")
-                    return False
-            else:
-                self.log("⚠️  No product ID to verify, but list retrieval successful")
-                return True
+        if success and response.get('id') == self.created_product_id:
+            self.log(f"✅ Product retrieved successfully: {response.get('title')}")
+            return True
         else:
-            self.log("❌ Products list retrieval failed or invalid response format")
+            self.log("❌ Product retrieval failed or ID mismatch")
+            return False
+
+    def test_update_product(self):
+        """Test 4: PUT /api/products/{id} -> change title to "Updated Deck" -> verify"""
+        if not self.created_product_id or not self.token:
+            self.log("❌ No product ID or token available for update test")
+            return False
+            
+        update_data = {
+            "title": "Updated Deck",
+            "description": "Test product for API validation - UPDATED",
+            "images": ["https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_0985.jpg?fit=640%2C480&ssl=1"]
+        }
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        success, response = self.run_test(
+            "PUT /api/products/{id}",
+            "PUT",
+            f"products/{self.created_product_id}",
+            200,
+            data=update_data,
+            headers=headers
+        )
+        
+        if success and response.get('title') == "Updated Deck":
+            self.log(f"✅ Product updated successfully, title changed to: {response.get('title')}")
+            return True
+        else:
+            self.log("❌ Product update failed or title not changed")
+            return False
+
+    def test_delete_product(self):
+        """Test 5: DELETE /api/products/{id} -> ok true"""
+        if not self.created_product_id or not self.token:
+            self.log("❌ No product ID or token available for delete test")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        success, response = self.run_test(
+            "DELETE /api/products/{id}",
+            "DELETE",
+            f"products/{self.created_product_id}",
+            200,
+            headers=headers
+        )
+        
+        if success and response.get('ok') == True:
+            self.log(f"✅ Product deleted successfully")
+            return True
+        else:
+            self.log("❌ Product deletion failed or 'ok' not true")
             return False
 
     def run_all_tests(self):
-        """Run all backend API tests in sequence"""
-        self.log("🚀 Starting Phoenix Trailers API Tests")
+        """Run all backend API tests as specified in review request"""
+        self.log("🚀 Starting Phoenix Trailers Backend API Tests")
         self.log(f"   Base URL: {self.base_url}")
         self.log(f"   API URL: {self.api_url}")
         
-        # Test sequence
+        # Test sequence as requested
         tests = [
-            ("API Health", self.test_api_health),
-            ("User Registration", self.test_register),
-            ("User Login", self.test_login),
-            ("Create Product", self.test_create_product),
-            ("List Products", self.test_list_products)
+            ("Login/Register", self.test_login),
+            ("1) GET /api/products", self.test_get_products_list),
+            ("2) Create product via POST /api/products", self.test_create_product),
+            ("3) GET /api/products/{id}", self.test_get_product_by_id),
+            ("4) PUT /api/products/{id}", self.test_update_product),
+            ("5) DELETE /api/products/{id}", self.test_delete_product)
         ]
         
         results = []
         for test_name, test_func in tests:
-            self.log(f"\n{'='*50}")
+            self.log(f"\n{'='*60}")
             result = test_func()
             results.append((test_name, result))
             
         # Print summary
-        self.log(f"\n{'='*50}")
-        self.log("📊 TEST SUMMARY")
+        self.log(f"\n{'='*60}")
+        self.log("📊 BACKEND TEST SUMMARY")
         self.log(f"   Tests Run: {self.tests_run}")
         self.log(f"   Tests Passed: {self.tests_passed}")
         self.log(f"   Success Rate: {(self.tests_passed/self.tests_run)*100:.1f}%")
