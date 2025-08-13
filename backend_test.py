@@ -258,9 +258,53 @@ class PhoenixTrailersAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
+    """Run the specific backend tests as requested in review"""
     tester = PhoenixTrailersAPITester()
-    success = tester.run_all_tests()
-    return 0 if success else 1
+    
+    # Run tests in the exact sequence requested
+    print("🎯 BACKEND TESTS AS REQUESTED:")
+    print("1) GET /api/products (should 200 list)")
+    print("2) Create product via POST /api/products (after login) -> verify id") 
+    print("3) GET /api/products/{id} -> returns created product")
+    print("4) PUT /api/products/{id} -> change title to 'Updated Deck' -> verify")
+    print("5) DELETE /api/products/{id} -> ok true")
+    print("Using credentials: email test+phoenix@mvp.dev, password test12345")
+    print("="*60)
+    
+    # Step 1: Login first
+    if not tester.test_login():
+        print("❌ Cannot proceed without authentication")
+        return 1
+    
+    # Step 2: Test 1 - GET /api/products
+    if not tester.test_get_products_list():
+        print("❌ GET /api/products failed")
+        return 1
+    
+    # Step 3: Test 2 - Create product
+    if not tester.test_create_product():
+        print("❌ POST /api/products failed")
+        return 1
+    
+    # Step 4: Test 3 - GET product by ID
+    if not tester.test_get_product_by_id():
+        print("❌ GET /api/products/{id} failed")
+        return 1
+    
+    # Step 5: Test 4 - Update product
+    if not tester.test_update_product():
+        print("❌ PUT /api/products/{id} failed")
+        return 1
+    
+    # Step 6: Test 5 - Delete product
+    if not tester.test_delete_product():
+        print("❌ DELETE /api/products/{id} failed")
+        return 1
+    
+    print("\n🎉 ALL BACKEND TESTS PASSED!")
+    print(f"   Total Tests: {tester.tests_run}")
+    print(f"   Passed: {tester.tests_passed}")
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
