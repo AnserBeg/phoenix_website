@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail } from "lucide-react";
+import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // Never hardcode
 const API = `${BACKEND_URL}/api`;
@@ -10,11 +10,11 @@ const HERO_BG = "https://customer-assets.emergentagent.com/job_phoenix-scraper/a
 
 // User-provided featured images
 const USER_FEATURED = [
-  { title: "Drop Deck Ramp", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/nhs6king_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_57_19%20PM.png" },
-  { title: "Towable Screen", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/ygql9kbe_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_54_47%20PM.png" },
-  { title: "Utility Trailer", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/s6j4v1h5_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_52_01%20PM.png" },
-  { title: "Flatbed with Tanks", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/4ofcgha9_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_54%20PM.png" },
-  { title: "Control Van", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/4km1o9e0_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_59%20PM.png" },
+  { key: 'drop-deck', title: "Drop Deck Ramp", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/nhs6king_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_57_19%20PM.png", desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment loading.", link: "/drop-decks" },
+  { key: 'towable', title: "Towable Screen", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/ygql9kbe_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_54_47%20PM.png", desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
+  { key: 'utility', title: "Utility Trailer", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/s6j4v1h5_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_52_01%20PM.png", desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/products" },
+  { key: 'tanks', title: "Flatbed with Tanks", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/4ofcgha9_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_54%20PM.png", desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/flatbeds" },
+  { key: 'control-van', title: "Control Van", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/4km1o9e0_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_59%20PM.png", desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
 ];
 
 // -------------- Reusable helpers --------------
@@ -84,9 +84,29 @@ function Home(){
       <section className="container">
         <h3>Featured Builds</h3>
         <p className="h-sub">A glimpse at the range — from road-ready flatbeds to specialty control vans.</p>
-        <div className="featured-grid">
-          {USER_FEATURED.map((it,i)=> (
-            <img key={i} src={it.src} alt={it.title} title={it.title}/>
+        <div className="featured-list">
+          {USER_FEATURED.map((it, i) => (
+            <div key={it.key} className="featured-row">
+              {i % 2 === 0 ? (
+                <>
+                  <div className="featured-media"><img src={it.src} alt={it.title}/></div>
+                  <div className="featured-copy">
+                    <h4>{it.title}</h4>
+                    <p>{it.desc}</p>
+                    <Link to={it.link} className="btn secondary" style={{display:'inline-flex', alignItems:'center', gap:8, marginTop:12}}>Learn more <ArrowRight size={16}/></Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="featured-copy">
+                    <h4>{it.title}</h4>
+                    <p>{it.desc}</p>
+                    <Link to={it.link} className="btn secondary" style={{display:'inline-flex', alignItems:'center', gap:8, marginTop:12}}>Learn more <ArrowRight size={16}/></Link>
+                  </div>
+                  <div className="featured-media"><img src={it.src} alt={it.title}/></div>
+                </>
+              )}
+            </div>
           ))}
         </div>
       </section>
