@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight } from "lucide-react";
+import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight, Menu, X } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // Never hardcode
 const API = `${BACKEND_URL}/api`;
@@ -49,6 +49,8 @@ function useScrollAnimations() {
 // -------------- Layout --------------
 function Shell({ children }){
   useScrollAnimations();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [deskOpen, setDeskOpen] = useState(false);
   return (
     <div className="App">
       <nav className="nav">
@@ -57,6 +59,7 @@ function Shell({ children }){
             <img className="logo-img" src={LOGO} alt="Phoenix Trailers" />
             <Link to="/">Phoenix Trailers</Link>
           </div>
+
           <div className="nav-links">
             <Link to="/products">Products</Link>
             <Link to="/flatbeds">Flatbeds</Link>
@@ -65,13 +68,49 @@ function Shell({ children }){
             <Link to="/control-vans">Control Vans</Link>
             <Link to="/custom">Custom Builds</Link>
             <Link to="/dealers">Dealers</Link>
-            <Link to="/about">About</Link>
             <Link to="/contact">Contact</Link>
-            <Link to="/add">Add Product</Link>
-            <Link to="/login">Login</Link>
+          </div>
+
+          <div className="nav-actions">
+            {/* Desktop dropdown menu */}
+            <div className="desk-menu desk-hamburger">
+              <button className="btn secondary small" onClick={() => setDeskOpen(v=>!v)} aria-label="Open menu"><Menu size={18}/></button>
+              <div className={`dropdown-panel ${deskOpen ? 'open' : ''}`}>
+                <Link className="dropdown-item" to="/about" onClick={()=>setDeskOpen(false)}>About</Link>
+                <Link className="dropdown-item" to="/add" onClick={()=>setDeskOpen(false)}>Add Product</Link>
+                <Link className="dropdown-item" to="/login" onClick={()=>setDeskOpen(false)}>Login</Link>
+              </div>
+            </div>
+            {/* Mobile hamburger */}
+            <button className="btn secondary small hamburger" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={18}/></button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile drawer */}
+      <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`} onClick={(e)=>{ if(e.target.classList.contains('mobile-menu')) setMobileOpen(false) }}>
+        <div className="mobile-drawer">
+          <div className="mobile-head">
+            <div className="logo" style={{gap:8}}>
+              <img className="logo-img" style={{height:28}} src={LOGO} alt="Phoenix Trailers" />
+              <span>Phoenix Trailers</span>
+            </div>
+            <button className="btn secondary small" onClick={()=>setMobileOpen(false)} aria-label="Close"><X size={18}/></button>
+          </div>
+          <Link className="mlink" to="/products" onClick={()=>setMobileOpen(false)}>Products</Link>
+          <Link className="mlink" to="/flatbeds" onClick={()=>setMobileOpen(false)}>Flatbeds</Link>
+          <Link className="mlink" to="/drop-decks" onClick={()=>setMobileOpen(false)}>Drop Decks</Link>
+          <Link className="mlink" to="/truck-decks" onClick={()=>setMobileOpen(false)}>Truck Decks</Link>
+          <Link className="mlink" to="/control-vans" onClick={()=>setMobileOpen(false)}>Control Vans</Link>
+          <Link className="mlink" to="/custom" onClick={()=>setMobileOpen(false)}>Custom Builds</Link>
+          <Link className="mlink" to="/dealers" onClick={()=>setMobileOpen(false)}>Dealers</Link>
+          <Link className="mlink" to="/about" onClick={()=>setMobileOpen(false)}>About</Link>
+          <Link className="mlink" to="/contact" onClick={()=>setMobileOpen(false)}>Contact</Link>
+          <Link className="mlink" to="/add" onClick={()=>setMobileOpen(false)}>Add Product</Link>
+          <Link className="mlink" to="/login" onClick={()=>setMobileOpen(false)}>Login</Link>
+        </div>
+      </div>
+
       {children}
       <footer className="footer container">© {new Date().getFullYear()} Phoenix Trailer Manufacturing — Calgary, AB</footer>
     </div>
@@ -97,8 +136,8 @@ function Home(){
         <div className="hero-wrap container">
           <div className="reveal" style={{maxWidth:860}}>
             <h1 className="h-title">Making Top Quality Trucks & Trailers</h1>
-            <p className="h-sub">Flatbeds, drop decks, control vans, towable screens and custom builds. Built for Canadian conditions with precision fabrication.</p>
-            <div className="cta">
+            {/* Subtext removed per request */}
+            <div className="cta" style={{marginTop:16}}>
               <Link className="btn" to="/products">Browse Products</Link>
               <Link className="btn secondary" to="/custom">Custom Builds</Link>
             </div>
