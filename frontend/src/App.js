@@ -4,18 +4,18 @@ import { BrowserRouter, Routes, Route, Link, useNavigate, useParams, useLocation
 import axios from "axios";
 import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight, Menu, X } from "lucide-react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // Never hardcode
+const BACKEND_URL = "http://localhost:8000"; // Local backend server
 const API = `${BACKEND_URL}/api`;
-const HERO_BG = "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/gc2m0gcr_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2008_22_08%20PM.png";
-const LOGO = "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/k8r8d71w_Phoenix%20Logo%20Full%20Transparent.svg";
+const HERO_BG = `${BACKEND_URL}/uploads/migrated/image_38bef026.jpg`;
+const LOGO = `${BACKEND_URL}/uploads/migrated/phoenix_logo_3264f6df.svg`;
 
 // User-provided featured images
 const USER_FEATURED = [
-  { key: 'drop-deck', title: "Drop Deck Ramp", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/nhs6king_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_57_19%20PM.png", desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment loading.", link: "/drop-decks" },
-  { key: 'towable', title: "Towable Screen", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/ygql9kbe_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_54_47%20PM.png", desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
-  { key: 'utility', title: "Utility Trailer", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/s6j4v1h5_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_52_01%20PM.png", desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/products" },
-  { key: 'tanks', title: "Flatbed with Tanks", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/4ofcgha9_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_54%20PM.png", desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/flatbeds" },
-  { key: 'control-van', title: "Control Van", src: "https://customer-assets.emergentagent.com/job_phoenix-scraper/artifacts/4km1o9e0_ChatGPT%20Image%20Aug%2012%2C%202025%2C%2007_51_59%20PM.png", desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
+  { key: 'drop-deck', title: "Drop Deck Ramp", src: `${BACKEND_URL}/uploads/migrated/image_da077c5a.jpg`, desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment loading.", link: "/drop-decks" },
+  { key: 'towable', title: "Towable Screen", src: `${BACKEND_URL}/uploads/migrated/image_06b6a17d.jpg`, desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
+  { key: 'utility', title: "Utility Trailer", src: `${BACKEND_URL}/uploads/migrated/image_d43cb4b8.jpg`, desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/products" },
+  { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/flatbeds" },
+  { key: 'control-van', title: "Control Van", src: `${BACKEND_URL}/uploads/migrated/image_f595beb2.jpg`, desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
 ];
 
 // -------------- Reusable helpers --------------
@@ -289,8 +289,36 @@ function EditProduct(){
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([""]);
+  const [uploading, setUploading] = useState(false);
+  
   useEffect(()=>{ (async()=>{ try{ const {data}=await api.get(`/products/${id}`); setTitle(data.title); setDescription(data.description); setImages(data.images?.length?data.images:[""]); }catch(e){ console.error(e);} })(); },[id]);
+  
+  const handleFileUpload = async (file, index) => {
+    if (!file) return;
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await api.post("/upload", formData, {
+        headers: { ...auth.headers, 'Content-Type': 'multipart/form-data' }
+      });
+      
+      // Update the image at the specified index with the uploaded file URL
+      const newImages = [...images];
+      newImages[index] = response.data.url;
+      setImages(newImages);
+    } catch (err) {
+      alert("Failed to upload image");
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
+  
   const submit = async (e)=>{ e.preventDefault(); try{ await api.put(`/products/${id}`, {title, description, images: images.filter(Boolean)}, {headers: auth.headers}); nav(`/products/${id}`);}catch(e){ alert('Update failed'); }}
+  
   return (
     <Shell>
       <div className="container" style={{maxWidth:720}}>
@@ -301,12 +329,28 @@ function EditProduct(){
             <input className="input" value={title} onChange={e=>setTitle(e.target.value)} required />
             <label className="label">Description</label>
             <textarea className="input" rows={5} value={description} onChange={e=>setDescription(e.target.value)} required />
-            <label className="label">Image URLs</label>
+            <label className="label">Images (Upload files or enter URLs)</label>
             {images.map((url, i) => (
-              <input key={i} className="input" value={url} onChange={e=>setImages(prev=> prev.map((v,idx)=> idx===i?e.target.value:v))} />
+              <div key={i} style={{display:'grid', gap:8}}>
+                <input 
+                  className="input" 
+                  placeholder={`Image ${i+1} - Enter URL or upload file below`} 
+                  value={url} 
+                  onChange={e=>setImages(prev=> prev.map((v,idx)=> idx===i?e.target.value:v))} 
+                />
+                <div style={{display:'flex', gap:8, alignItems:'center'}}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => handleFileUpload(e.target.files[0], i)}
+                    style={{flex:1}}
+                  />
+                  {uploading && <span>Uploading...</span>}
+                </div>
+              </div>
             ))}
             <button type="button" className="btn secondary" onClick={()=>setImages([...images, ""]) }>Add another image</button>
-            <button className="btn" type="submit">Save changes</button>
+            <button className="btn" type="submit" disabled={uploading}>Save changes</button>
           </div>
         </form>
       </div>
@@ -353,8 +397,35 @@ function AddProduct(){
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([""]);
+  const [uploading, setUploading] = useState(false);
+  
   const addField = () => setImages([...images, ""]);
   const updateImg = (i, val) => setImages(prev => prev.map((v,idx)=> idx===i?val:v));
+  
+  const handleFileUpload = async (file, index) => {
+    if (!file) return;
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await api.post("/upload", formData, {
+        headers: { ...auth.headers, 'Content-Type': 'multipart/form-data' }
+      });
+      
+      // Update the image at the specified index with the uploaded file URL
+      const newImages = [...images];
+      newImages[index] = response.data.url;
+      setImages(newImages);
+    } catch (err) {
+      alert("Failed to upload image");
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
+  
   const submit = async (e) => {
     e.preventDefault();
     try{
@@ -363,6 +434,7 @@ function AddProduct(){
       nav(`/products`);
     }catch(err){ alert("Failed to create product. Are you logged in?"); console.error(err); }
   }
+  
   return (
     <Shell>
       <div className="container" style={{maxWidth:720}}>
@@ -376,12 +448,28 @@ function AddProduct(){
             <input className="input" value={title} onChange={e=>setTitle(e.target.value)} required />
             <label className="label">Description</label>
             <textarea className="input" rows={5} value={description} onChange={e=>setDescription(e.target.value)} required />
-            <label className="label">Image URLs</label>
+            <label className="label">Images (Upload files or enter URLs)</label>
             {images.map((url, i) => (
-              <input key={i} className="input" placeholder={`https://... image ${i+1}`} value={url} onChange={e=>updateImg(i, e.target.value)} />
+              <div key={i} style={{display:'grid', gap:8}}>
+                <input 
+                  className="input" 
+                  placeholder={`Image ${i+1} - Enter URL or upload file below`} 
+                  value={url} 
+                  onChange={e=>updateImg(i, e.target.value)} 
+                />
+                <div style={{display:'flex', gap:8, alignItems:'center'}}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => handleFileUpload(e.target.files[0], i)}
+                    style={{flex:1}}
+                  />
+                  {uploading && <span>Uploading...</span>}
+                </div>
+              </div>
             ))}
             <button type="button" className="btn secondary" onClick={addField}>Add another image</button>
-            <button className="btn" type="submit" disabled={!auth.isAuthed}>Save product</button>
+            <button className="btn" type="submit" disabled={!auth.isAuthed || uploading}>Save product</button>
           </div>
         </form>
       </div>
@@ -406,47 +494,52 @@ function Section({title, lead, images=[]}){
 
 function Flatbeds(){
   const imgs=[
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5050.jpg?fit=1024%2C768&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5053.jpg?fit=1024%2C768&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5055.jpg?fit=1024%2C768&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5052.jpg?fit=1024%2C768&ssl=1",
+    `${BACKEND_URL}/uploads/migrated/image_e8dda930.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_3f24da20.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_fa261e90.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_3398b663.jpg`,
   ];
   return <Shell><Section title="Flatbeds" lead="Drive efficiently and securely with our flatbeds" images={imgs}/></Shell>
 }
 function DropDecks(){
   const imgs=[
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_0985.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_4049-1.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_2771.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_2772-1.jpg?fit=640%2C480&ssl=1",
+    `${BACKEND_URL}/uploads/migrated/image_65c884e6.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_542c7abf.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_abdea658.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_09c5bb7b.jpg`,
   ];
   return <Shell><Section title="Drop Decks" lead="High-performance drop decks for easy loading and maximum stability" images={imgs}/></Shell>
 }
 function TruckDecks(){
   const imgs=[
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5062.jpg?fit=1024%2C768&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5067.jpg?fit=1024%2C768&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5068.jpg?fit=1024%2C768&ssl=1",
+    `${BACKEND_URL}/uploads/migrated/image_ca15d79b.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_93076e07.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_f9c4cf8a.jpg`,
   ];
   return <Shell><Section title="Truck Decks" lead="Truck decks designed for heavy-duty hauling and seamless integration" images={imgs}/></Shell>
 }
 function ControlVans(){
   const imgs=[
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5132-1.jpg?fit=768%2C576&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5134-1.jpg?fit=768%2C576&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_5136.jpg?fit=768%2C576&ssl=1",
+    `${BACKEND_URL}/uploads/migrated/image_2764764d.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_870a08df.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_5d8f4c9a.jpg`,
+    // Your new control van images
+    `${BACKEND_URL}/uploads/IMG_1384-2-rotated.webp`,
+    `${BACKEND_URL}/uploads/IMG_1385-1.webp`, 
+    `${BACKEND_URL}/uploads/IMG_1387-1-rotated.webp`,
+    `${BACKEND_URL}/uploads/IMG_5134.webp`,
   ];
   return <Shell><Section title="Control Vans" lead="Control vans equipped for optimal operation and versatility" images={imgs}/></Shell>
 }
 function CustomBuilds(){
   const imgs=[
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/file.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/file-1.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/04/IMG_3331.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_2765-1.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_3334-1.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_1155.jpg?fit=640%2C480&ssl=1",
-    "https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_0075.jpg?fit=640%2C480&ssl=1",
+    `${BACKEND_URL}/uploads/migrated/image_ca614615.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_c139a87c.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_71620a45.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_b654c362.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_f2f89d30.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_adc1ada8.jpg`,
+    `${BACKEND_URL}/uploads/migrated/image_37e620b6.jpg`,
   ];
   return (
     <Shell>
@@ -476,7 +569,7 @@ function About(){
       <div className="section container reveal">
         <h2>Serving Canadians Since 2020</h2>
         <p className="lead">Founded in 2020, Phoenix Manufacturing is a proudly Canadian-owned company stemming from RPM Truck & Trailer Repair (est. 1991). We design and build specialized trailer solutions with craftsmanship and customer focus.</p>
-        <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:12}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/IMG_4786.jpg?fit=640%2C480&ssl=1" alt="Shop"/>
+        <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:12}} src={`${BACKEND_URL}/uploads/migrated/image_1127fa83.jpg`} alt="Shop"/>
         <h3 style={{marginTop:20}}>Our Team</h3>
         <ul style={{marginTop:8, color:'var(--muted)'}}>
           <li>Sean McCormick — Co-Founder, CEO</li>
@@ -524,13 +617,13 @@ function Dealers(){
             <h3>Calgary</h3>
             <p className="lead">Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</p>
             <p>Email: <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a> | Phone: (403) 837-1322</p>
-            <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/10/Screenshot-2024-10-24-115800.png?fit=596%2C303&ssl=1" alt="Calgary map"/>
+            <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:8}} src={`${BACKEND_URL}/uploads/migrated/image_21dc215b.jpg`} alt="Calgary map"/>
           </div>
           <div className="form reveal">
             <h3>Rocky View</h3>
             <p className="lead">RPM Trailer Repair Services Lt. — 28515 Kleysen Way, Rocky View, AB, T1X 0K1</p>
             <p>Email: <a href="mailto:paulm@rpmtrailer.ca">paulm@rpmtrailer.ca</a> | Phone: (403) 819-5516</p>
-            <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:8}} src="https://i0.wp.com/phoenixtrailers.ca/wp-content/uploads/2024/05/IMG_20200718_111136.jpg?fit=680%2C340&ssl=1" alt="Rocky View"/>
+            <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:8}} src={`${BACKEND_URL}/uploads/migrated/image_e4ba49c3.jpg`} alt="Rocky View"/>
           </div>
         </div>
       </div>
