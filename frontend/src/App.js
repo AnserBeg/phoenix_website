@@ -19,6 +19,7 @@ const USER_FEATURED = [
   { key: 'towable', title: "Towable Screen", src: `${BACKEND_URL}/uploads/migrated/image_06b6a17d.jpg`, desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
   { key: 'utility', title: "Utility Trailer", src: `${BACKEND_URL}/uploads/migrated/image_d43cb4b8.jpg`, desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/custom" },
   { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, src2: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 02_43_39 PM.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/custom" },
+  { key: 'flatbed-premium', title: "Premium Flatbed", src: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 04_01_19 PM.jpg`, src2: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 03_41_52 PM (1).jpg`, desc: "High-quality flatbed trailer designed for heavy-duty transportation with enhanced durability.", link: "/flatbeds" },
   { key: 'control-van', title: "Control Van", src: `${BACKEND_URL}/uploads/migrated/image_f595beb2.jpg`, desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
 ];
 
@@ -372,7 +373,7 @@ function Home(){
         <h2>Featured Solutions</h2>
         <div className="featured-grid">
           {USER_FEATURED.map((item) => (
-            item.key === 'tanks' ? (
+            item.key === 'tanks' || item.key === 'flatbed-premium' ? (
               <ToggleImageCard key={item.key} item={item} />
             ) : (
               <div key={item.key} className="featured-item reveal">
