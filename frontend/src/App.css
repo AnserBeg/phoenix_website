@@ -152,7 +152,7 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   background: #fff !important;
 }
 .wipe-overlay {
