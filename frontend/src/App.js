@@ -897,6 +897,8 @@ function Flatbeds(){
     `${BACKEND_URL}/uploads/migrated/image_3f24da20.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_fa261e90.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_3398b663.jpg`,
+    `${BACKEND_URL}/uploads/IMG_5178.jpg`,
+    `${BACKEND_URL}/uploads/IMG_5180 (1).jpg`,
   ];
   return (
     <Shell>
