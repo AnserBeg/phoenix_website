@@ -6,6 +6,7 @@ import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, Arr
 import { ThreeDBackground } from "./components/3DAnimation.jsx";
 import { Trailer3DViewer } from "./components/3DModelViewer.jsx";
 import { Footer } from "./components/Footer.jsx";
+import { OptimizedImage, OptimizedVideo } from "./components/OptimizedImage.jsx";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"; // Use environment variable or fallback to localhost
 const API = `${BACKEND_URL}/api`;
@@ -128,13 +129,13 @@ function Home(){
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Hero carousel media - images and video
+  // Hero carousel media - images and video (using optimized files)
   const heroMedia = [
-    { type: 'image', src: `${BACKEND_URL}/uploads/5.jpg`, duration: 6000 },
+    { type: 'image', src: `${BACKEND_URL}/uploads/optimized/5_optimized.jpg`, duration: 6000 },
     { type: 'video', src: `${BACKEND_URL}/uploads/Video_Editing_and_Enhancement_Request.mp4`, duration: 8000 },
-    { type: 'image', src: `${BACKEND_URL}/uploads/2.jpg`, duration: 6000 },
-    { type: 'image', src: `${BACKEND_URL}/uploads/3.jpg`, duration: 6000 },
-    { type: 'image', src: `${BACKEND_URL}/uploads/4.jpg`, duration: 6000 }
+    { type: 'image', src: `${BACKEND_URL}/uploads/optimized/2_optimized.jpg`, duration: 6000 },
+    { type: 'image', src: `${BACKEND_URL}/uploads/optimized/3_optimized.jpg`, duration: 6000 },
+    { type: 'image', src: `${BACKEND_URL}/uploads/optimized/4_optimized.jpg`, duration: 6000 }
   ];
   
   // Fallback to original image if carousel fails
@@ -175,45 +176,18 @@ function Home(){
   
   // Manual navigation
   const goToMedia = (index) => {
-    if (index !== currentMediaIndex) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentMediaIndex(index);
-        setIsTransitioning(false);
-      }, 300);
-    }
-  };
-  
-  const nextMedia = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentMediaIndex((prevIndex) => 
-        prevIndex === heroMedia.length - 1 ? 0 : prevIndex + 1
-      );
-      setIsTransitioning(false);
-    }, 300);
-  };
-  
-  const prevMedia = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentMediaIndex((prevIndex) => 
-        prevIndex === 0 ? heroMedia.length - 1 : prevIndex - 1
-      );
-      setIsTransitioning(false);
-    }, 300);
+    setCurrentMediaIndex(index);
+    setIsTransitioning(false);
   };
 
   return (
     <Shell>
-      {/* <ThreeDBackground /> */}
-      <div style={{
+      <ThreeDBackground style={{
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%',
-        background: 'linear-gradient(135deg, #fafbfc 0%, #e5e7eb 50%, #d1d5db 100%)',
         zIndex: -1
       }} />
       <section className="hero" style={{
@@ -238,11 +212,12 @@ function Home(){
             opacity: isTransitioning ? 0.7 : 1
           }} />
         ) : (
-          <video
+          <OptimizedVideo
             key={currentMediaIndex} // Force re-render on change
             autoPlay
             muted
             playsInline
+            preload="metadata" // Only load metadata, not the full video
             style={{
               position: 'absolute',
               top: 0,
@@ -269,7 +244,7 @@ function Home(){
           gap: '12px',
           zIndex: 10
         }}>
-          {heroMedia.map((media, index) => (
+          {heroMedia.map((_, index) => (
             <button
               key={index}
               onClick={() => goToMedia(index)}
@@ -285,116 +260,71 @@ function Home(){
             />
           ))}
         </div>
-        
 
-        
-        {/* Dark overlay for better text readability */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(135deg, rgba(15,20,26,0.8) 0%, rgba(15,20,26,0.6) 50%, rgba(15,20,26,0.4) 100%)',
-          zIndex: 1
-        }} />
-        
-        <div className="hero-wrap container" style={{position: 'relative', zIndex: 2}}>
-          <div className="reveal" style={{maxWidth:860}}>
-            <h1 className="h-title" style={{fontSize: '3.5rem', lineHeight: '1.2', marginBottom: '2rem'}}>
-              Making Top Quality Trucks & Trailers
-            </h1>
-            {/* Subtext removed per request */}
-            <div className="cta" style={{marginTop: '2rem'}}>
-              <Link className="btn" to="/products">Browse Products</Link>
-              <Link className="btn secondary" to="/custom">Custom Builds</Link>
+        {/* Hero Content */}
+        <div className="container" style={{position: 'relative', zIndex: 10}}>
+          <div className="hero-content reveal">
+            <h1>Phoenix Manufacturing</h1>
+            <p className="hero-subtitle">Custom trailer solutions engineered for performance and reliability</p>
+            <div className="hero-buttons">
+              <Link to="/products" className="btn btn-primary">
+                View Products <ArrowRight size={20} />
+              </Link>
+              <Link to="/custom" className="btn btn-secondary">
+                Custom Build
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="container reveal">
-        <h3>Featured Builds</h3>
-        <p className="h-sub" style={{color:'var(--muted)'}}>A glimpse at the range — from road-ready flatbeds to specialty control vans.</p>
-        <div className="featured-list">
-          {USER_FEATURED.map((it, i) => (
-            <div key={it.key} className={`featured-row ${i % 2 === 0 ? 'slide-left' : 'slide-right'}`}>
-              {i % 2 === 0 ? (
-                <>
-                  <div className="featured-media"><img src={it.src} alt={it.title}/></div>
-                  <div className="featured-copy">
-                    <h4>{it.title}</h4>
-                    <p>{it.desc}</p>
-                    <Link to={it.link} className="btn secondary" style={{display:'inline-flex', alignItems:'center', gap:8, marginTop:12}}>Learn more <ArrowRight size={16}/></Link>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="featured-copy">
-                    <h4>{it.title}</h4>
-                    <p>{it.desc}</p>
-                    <Link to={it.link} className="btn secondary" style={{display:'inline-flex', alignItems:'center', gap:8, marginTop:12}}>Learn more <ArrowRight size={16}/></Link>
-                  </div>
-                  <div className="featured-media"><img src={it.src} alt={it.title}/></div>
-                </>
-              )}
+      {/* Featured Products */}
+      <section className="featured container reveal">
+        <h2>Featured Solutions</h2>
+        <div className="featured-grid">
+          {USER_FEATURED.map((item) => (
+            <div key={item.key} className="featured-item reveal">
+              <OptimizedImage 
+                src={item.src} 
+                alt={item.title}
+                loading="lazy" // Lazy load images
+              />
+              <div className="featured-content">
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+                <Link to={item.link} className="btn btn-outline">
+                  Learn More <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="container reveal">
-        <h3>What We Build</h3>
-        <div className="grid" style={{marginTop:12}}>
-          <Link className="card reveal" to="/flatbeds"><h4>Flatbeds</h4><p>Multi-length options with secure tie-downs and durable decks.</p></Link>
-          <Link className="card reveal" to="/drop-decks"><h4>Drop Decks</h4><p>Lower deck height for easy loading and improved stability.</p></Link>
-          <Link className="card reveal" to="/control-vans"><h4>Control Vans</h4><p>Operator-ready cabins with power, access, and visibility.</p></Link>
-        </div>
-      </section>
-
-      <section className="container reveal">
-        <h3>Why Phoenix</h3>
+      {/* Features Section */}
+      <section className="features-section container reveal">
+        <h2>Why Choose Phoenix?</h2>
         <div className="features">
           <div className="feature reveal">
-            <div className="icon"><ShieldCheck size={20}/></div>
-            <h4>Built to Last</h4>
-            <p className="h-sub">Industrial-grade materials, quality welds, and rigorous QA.</p>
+            <div className="icon"><ShieldCheck size={24}/></div>
+            <h4>Quality Assurance</h4>
+            <p>Every trailer built to exacting standards with premium materials</p>
           </div>
           <div className="feature reveal">
-            <div className="icon"><Wrench size={20}/></div>
-            <h4>Custom Fabrication</h4>
-            <p className="h-sub">Tailored solutions for your application and region.</p>
+            <div className="icon"><Wrench size={24}/></div>
+            <h4>Custom Design</h4>
+            <p>Tailored solutions designed around your specific requirements</p>
           </div>
           <div className="feature reveal">
-            <div className="icon"><Factory size={20}/></div>
+            <div className="icon"><Factory size={24}/></div>
             <h4>Canadian Made</h4>
-            <p className="h-sub">Designed and manufactured for Canadian conditions.</p>
+            <p>Proudly manufactured in Canada with local expertise</p>
           </div>
           <div className="feature reveal">
-            <div className="icon"><Truck size={20}/></div>
-            <h4>Fast Turnarounds</h4>
-            <p className="h-sub">Responsive builds with dependable delivery.</p>
+            <div className="icon"><Truck size={24}/></div>
+            <h4>Reliable Service</h4>
+            <p>Dedicated support from concept to delivery and beyond</p>
           </div>
-        </div>
-
-      </section>
-
-      <section className="container reveal">
-        <h3>Our Locations</h3>
-        <div className="grid" style={{marginTop:12}}>
-          <div className="card reveal"><h4>Calgary</h4><p className="h-sub"><MapPin size={14}/> Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</p><p><Mail size={14}/> seanm@rpmtrailer.ca • <Phone size={14}/> (403) 837-1322</p></div>
-          <div className="card reveal"><h4>Rocky View</h4><p className="h-sub"><MapPin size={14}/> 28515 Kleysen Way, Rocky View, AB, T1X 0K1</p><p><Mail size={14}/> paulm@rpmtrailer.ca • <Phone size={14}/> (403) 819-5516</p></div>
-          <Link to="/dealers" className="card reveal" style={{display:'flex', alignItems:'center', justifyContent:'center'}}><h4>View all dealers →</h4></Link>
-        </div>
-      </section>
-
-      <section className="container reveal">
-        <div className="form" style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:12}}>
-          <div>
-            <h3>Have a build in mind?</h3>
-            <p className="h-sub">Talk to our fabrication team about specs, timelines and pricing.</p>
-          </div>
-          <div className="cta"><Link className="btn" to="/custom">Start a custom build</Link></div>
         </div>
       </section>
     </Shell>
@@ -404,7 +334,11 @@ function Home(){
 function ImgCard({title, src}){
   return (
     <div className="card reveal">
-      <img src={src} alt={title} />
+      <OptimizedImage 
+        src={src} 
+        alt={title} 
+        loading="lazy" // Lazy load images
+      />
       <h4>{title}</h4>
       <p>Engineered structures with industrial-grade components and clean welds.</p>
     </div>
@@ -462,9 +396,10 @@ function ProductCard({p}){
   return (
     <div className="card reveal" onClick={()=>nav(`/products/${p.id}`)} style={{cursor:'pointer'}}>
       {p.images?.[0] ? (
-        <img 
+        <OptimizedImage 
           src={p.images[0]} 
           alt={p.title}
+          loading="lazy" // Lazy load images
           onError={(e) => {
             console.error(`Failed to load image in card: ${p.images[0]}`);
             e.target.style.display = 'none';
@@ -591,11 +526,12 @@ function ProductDetail(){
         {p.images && p.images.length > 0 ? (
           <div className="gallery">
             {console.log(`Product ${p.title} images:`, p.images)}
-            {p.images.map((u,i)=> (
+                        {p.images.map((u,i)=> (
               <div key={i} style={{position: 'relative'}}>
-                <img 
+                <OptimizedImage 
                   src={u} 
                   alt={`${p.title} ${i+1}`} 
+                  loading="lazy" // Lazy load images
                   style={{
                     width: '100%',
                     height: '220px',
@@ -855,7 +791,7 @@ function Section({title, lead, images=[]}){
       {lead && <p className="lead">{lead}</p>}
       {images.length>0 && (
         <div className="gallery">
-          {images.map((u,i)=>(<img className="reveal" key={i} src={u} alt={`${title} ${i+1}`} />))}
+          {images.map((u,i)=>(<OptimizedImage className="reveal" key={i} src={u} alt={`${title} ${i+1}`} loading="lazy" />))}
         </div>
       )}
     </div>
@@ -1047,11 +983,12 @@ function About(){
         justifyContent: 'center'
       }}>
         {/* Background Video */}
-        <video
+        <OptimizedVideo
           autoPlay
           muted
           loop
           playsInline
+          preload="metadata" // Only load metadata, not the full video
           style={{
             position: 'absolute',
             top: 0,

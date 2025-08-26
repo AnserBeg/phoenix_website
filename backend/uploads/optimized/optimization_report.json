@@ -1,0 +1,31 @@
+{
+  "summary": {
+    "total_images": 14,
+    "total_videos": 2,
+    "total_3d_models": 9
+  },
+  "recommendations": {
+    "images": [
+      "Convert JPG/PNG to WebP (30-50% smaller)",
+      "Use responsive images with multiple sizes",
+      "Implement lazy loading"
+    ],
+    "videos": [
+      "Convert to WebM format (smaller, modern browsers)",
+      "Create 720p optimized MP4 versions",
+      "Add preload='metadata' and poster thumbnails",
+      "Use multiple source formats for compatibility"
+    ],
+    "3d_models": [
+      "Convert FBX to glTF/GLB (much smaller)",
+      "Reduce polygon count if possible",
+      "Compress textures to 1K or 2K max"
+    ]
+  },
+  "next_steps": [
+    "Install ffmpeg for video optimization",
+    "Install cwebp for WebP conversion",
+    "Update React components to use optimized files",
+    "Implement lazy loading and progressive loading"
+  ]
+}

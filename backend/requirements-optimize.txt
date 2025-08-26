@@ -1,0 +1,2 @@
+# Requirements for asset optimization script
+Pillow>=9.0.0
