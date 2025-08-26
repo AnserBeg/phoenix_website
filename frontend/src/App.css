@@ -64,17 +64,22 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .hero .btn.secondary:hover{background:rgba(255,255,255,0.1); color:#fff; border-color:#fff}
 
 /* Buttons */
-.btn{background:var(--brand); border:none; color:black; padding:14px 20px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow:0 6px 18px rgba(255,122,0,0.18)}
+.btn{background:var(--brand); border:none; color:black; padding:14px 20px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow:0 6px 18px rgba(255,122,0,0.18); text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s ease; white-space:nowrap; overflow:hidden; position:relative}
 .btn:hover{transform:translateY(-1px); box-shadow:0 10px 28px rgba(255,122,0,0.25)}
 .btn.secondary{background:transparent; color:var(--text); border:1px solid var(--border)}
 .btn.secondary:hover{background:#f3f4f6}
+.btn.primary{background:var(--brand); color:black; border:1px solid var(--brand)}
+.btn.primary:hover{background:var(--brand); transform:translateY(-1px); box-shadow:0 10px 28px rgba(255,122,0,0.25)}
+.btn.outline{background:transparent; color:var(--brand); border:1px solid var(--brand); box-shadow:none}
 .btn.outline:hover{background:var(--brand); color:black; transform:translateY(-1px); box-shadow:0 6px 18px rgba(255,122,0,0.18)}
+.btn.blue{background:#3b82f6; color:white; border:1px solid #3b82f6; box-shadow:0 6px 18px rgba(59,130,246,0.3)}
+.btn.blue:hover{background:#2563eb; border-color:#2563eb; transform:translateY(-1px); box-shadow:0 10px 28px rgba(59,130,246,0.4)}
 
 /* Hero content and buttons */
-.hero-content{text-align:left; max-width:600px; z-index:10}
-.hero-content h1{font-size:52px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; color:#fff; margin:0 0 16px 0}
-.hero-subtitle{font-size:20px; line-height:1.4; color:rgba(255,255,255,0.9); margin:0 0 32px 0; max-width:500px}
-.hero-buttons{display:flex; gap:16px; flex-wrap:wrap; align-items:center}
+.hero-content{text-align:left; max-width:600px; z-index:10; display:flex; flex-direction:column; gap:24px}
+.hero-content h1{font-size:52px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; color:#fff; margin:0; display:block}
+.hero-subtitle{font-size:20px; line-height:1.4; color:rgba(255,255,255,0.9); margin:0; max-width:500px; display:block}
+.hero-buttons{display:flex; gap:20px; flex-wrap:wrap; align-items:center; margin-top:8px}
 
 /* Cards */
 .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px}

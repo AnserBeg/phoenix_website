@@ -270,7 +270,7 @@ function Home(){
               <Link to="/products" className="btn btn-primary">
                 View Products <ArrowRight size={20} />
               </Link>
-              <Link to="/custom" className="btn btn-secondary">
+              <Link to="/custom" className="btn btn-blue">
                 Custom Build
               </Link>
             </div>
