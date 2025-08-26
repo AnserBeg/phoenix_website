@@ -146,6 +146,7 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
   height: 200px;
   overflow: hidden;
   background: #fff;
+  border: 2px solid red;
 }
 .wipe-wrap img {
   position: absolute;
@@ -163,7 +164,10 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
   background: #fff;
 }
 .wipe-overlay img {
+  object-fit: contain;
   background: #fff !important;
+  mix-blend-mode: normal;
+  filter: none;
 }
 
 /* Responsive */
