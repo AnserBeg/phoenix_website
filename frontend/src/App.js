@@ -7,7 +7,7 @@ import { ThreeDBackground } from "./components/3DAnimation.jsx";
 import { Trailer3DViewer } from "./components/3DModelViewer.jsx";
 import { Footer } from "./components/Footer.jsx";
 
-const BACKEND_URL = "http://localhost:8000"; // Local backend server
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"; // Use environment variable or fallback to localhost
 const API = `${BACKEND_URL}/api`;
 const HERO_BG = `${BACKEND_URL}/uploads/migrated/image_38bef026.jpg`;
 const LOGO = `${BACKEND_URL}/uploads/migrated/phoenix_logo_3264f6df.svg`;
