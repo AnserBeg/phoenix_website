@@ -3,6 +3,9 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight, Menu, X } from "lucide-react";
+import { ThreeDBackground } from "./components/3DAnimation.jsx";
+import { Trailer3DViewer } from "./components/3DModelViewer.jsx";
+import { Footer } from "./components/Footer.jsx";
 
 const BACKEND_URL = "http://localhost:8000"; // Local backend server
 const API = `${BACKEND_URL}/api`;
@@ -13,8 +16,8 @@ const LOGO = `${BACKEND_URL}/uploads/migrated/phoenix_logo_3264f6df.svg`;
 const USER_FEATURED = [
   { key: 'drop-deck', title: "Drop Deck Ramp", src: `${BACKEND_URL}/uploads/migrated/image_da077c5a.jpg`, desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment loading.", link: "/drop-decks" },
   { key: 'towable', title: "Towable Screen", src: `${BACKEND_URL}/uploads/migrated/image_06b6a17d.jpg`, desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
-  { key: 'utility', title: "Utility Trailer", src: `${BACKEND_URL}/uploads/migrated/image_d43cb4b8.jpg`, desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/products" },
-  { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/flatbeds" },
+  { key: 'utility', title: "Utility Trailer", src: `${BACKEND_URL}/uploads/migrated/image_d43cb4b8.jpg`, desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/custom" },
+  { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/custom" },
   { key: 'control-van', title: "Control Van", src: `${BACKEND_URL}/uploads/migrated/image_f595beb2.jpg`, desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
 ];
 
@@ -56,8 +59,9 @@ function Shell({ children }){
       <nav className="nav">
         <div className="nav-inner">
           <div className="logo">
-            <img className="logo-img" src={LOGO} alt="Phoenix Trailers" />
-            <Link to="/">Phoenix Trailers</Link>
+            <Link to="/">
+              <img className="logo-img" src={LOGO} alt="Phoenix Trailers" />
+            </Link>
           </div>
 
           <div className="nav-links">
@@ -92,8 +96,9 @@ function Shell({ children }){
         <div className="mobile-drawer">
           <div className="mobile-head">
             <div className="logo" style={{gap:8}}>
-              <img className="logo-img" style={{height:28}} src={LOGO} alt="Phoenix Trailers" />
-              <span>Phoenix Trailers</span>
+              <Link to="/" onClick={()=>setMobileOpen(false)}>
+                <img className="logo-img" style={{height:28}} src={LOGO} alt="Phoenix Trailers" />
+              </Link>
             </div>
             <button className="btn secondary small" onClick={()=>setMobileOpen(false)} aria-label="Close"><X size={18}/></button>
           </div>
@@ -112,7 +117,7 @@ function Shell({ children }){
       </div>
 
       {children}
-      <footer className="footer container">© {new Date().getFullYear()} Phoenix Trailer Manufacturing — Calgary, AB</footer>
+      <Footer />
     </div>
   );
 }
@@ -120,6 +125,21 @@ function Shell({ children }){
 // -------------- Pages --------------
 function Home(){
   const [heroY, setHeroY] = useState(0);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Hero carousel media - images and video
+  const heroMedia = [
+    { type: 'image', src: `${BACKEND_URL}/uploads/5.jpg`, duration: 6000 },
+    { type: 'video', src: `${BACKEND_URL}/uploads/Video_Editing_and_Enhancement_Request.mp4`, duration: 8000 },
+    { type: 'image', src: `${BACKEND_URL}/uploads/2.jpg`, duration: 6000 },
+    { type: 'image', src: `${BACKEND_URL}/uploads/3.jpg`, duration: 6000 },
+    { type: 'image', src: `${BACKEND_URL}/uploads/4.jpg`, duration: 6000 }
+  ];
+  
+  // Fallback to original image if carousel fails
+  const fallbackImage = HERO_BG;
+  
   useEffect(() => {
     let raf;
     const onScroll = () => {
@@ -129,15 +149,163 @@ function Home(){
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
   }, []);
+  
+  // Auto-advance carousel with dynamic timing and smooth transitions
+  useEffect(() => {
+    const currentMedia = heroMedia[currentMediaIndex];
+    
+    // Start transition 1 second before the media should change
+    const transitionTimer = setTimeout(() => {
+      setIsTransitioning(true);
+    }, currentMedia.duration - 1000);
+    
+    // Change media after transition period
+    const changeTimer = setTimeout(() => {
+      setCurrentMediaIndex((prevIndex) => 
+        prevIndex === heroMedia.length - 1 ? 0 : prevIndex + 1
+      );
+      setIsTransitioning(false);
+    }, currentMedia.duration);
+    
+    return () => {
+      clearTimeout(transitionTimer);
+      clearTimeout(changeTimer);
+    };
+  }, [currentMediaIndex, heroMedia.length]);
+  
+  // Manual navigation
+  const goToMedia = (index) => {
+    if (index !== currentMediaIndex) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentMediaIndex(index);
+        setIsTransitioning(false);
+      }, 300);
+    }
+  };
+  
+  const nextMedia = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentMediaIndex((prevIndex) => 
+        prevIndex === heroMedia.length - 1 ? 0 : prevIndex + 1
+      );
+      setIsTransitioning(false);
+    }, 300);
+  };
+  
+  const prevMedia = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentMediaIndex((prevIndex) => 
+        prevIndex === 0 ? heroMedia.length - 1 : prevIndex - 1
+      );
+      setIsTransitioning(false);
+    }, 300);
+  };
 
   return (
     <Shell>
-      <section className="hero" style={{backgroundImage:`url(${HERO_BG})`, backgroundSize:'cover', backgroundPosition:`center calc(50% + ${heroY}px)`}}>
-        <div className="hero-wrap container">
+      {/* <ThreeDBackground /> */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(135deg, #fafbfc 0%, #e5e7eb 50%, #d1d5db 100%)',
+        zIndex: -1
+      }} />
+      <section className="hero" style={{
+        minHeight: '100vh',
+        padding: '120px 0 80px 0',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+      >
+        {/* Background Media */}
+        {heroMedia[currentMediaIndex].type === 'image' ? (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${heroMedia[currentMediaIndex].src})`,
+            backgroundSize: 'cover',
+            backgroundPosition: `center calc(50% + ${heroY}px)`,
+            transition: 'opacity 1s ease-in-out',
+            opacity: isTransitioning ? 0.7 : 1
+          }} />
+        ) : (
+          <video
+            key={currentMediaIndex} // Force re-render on change
+            autoPlay
+            muted
+            playsInline
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: `center calc(50% + ${heroY}px)`,
+              transition: 'opacity 1s ease-in-out',
+              opacity: isTransitioning ? 0.7 : 1
+            }}
+            src={heroMedia[currentMediaIndex].src}
+            onLoadStart={() => setIsTransitioning(false)}
+          />
+        )}
+
+        {/* Carousel Navigation Dots */}
+        <div style={{
+          position: 'absolute',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '12px',
+          zIndex: 10
+        }}>
+          {heroMedia.map((media, index) => (
+            <button
+              key={index}
+              onClick={() => goToMedia(index)}
+              style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                border: 'none',
+                background: index === currentMediaIndex ? '#fff' : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            />
+          ))}
+        </div>
+        
+
+        
+        {/* Dark overlay for better text readability */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(135deg, rgba(15,20,26,0.8) 0%, rgba(15,20,26,0.6) 50%, rgba(15,20,26,0.4) 100%)',
+          zIndex: 1
+        }} />
+        
+        <div className="hero-wrap container" style={{position: 'relative', zIndex: 2}}>
           <div className="reveal" style={{maxWidth:860}}>
-            <h1 className="h-title">Making Top Quality Trucks & Trailers</h1>
+            <h1 className="h-title" style={{fontSize: '3.5rem', lineHeight: '1.2', marginBottom: '2rem'}}>
+              Making Top Quality Trucks & Trailers
+            </h1>
             {/* Subtext removed per request */}
-            <div className="cta" style={{marginTop:16}}>
+            <div className="cta" style={{marginTop: '2rem'}}>
               <Link className="btn" to="/products">Browse Products</Link>
               <Link className="btn secondary" to="/custom">Custom Builds</Link>
             </div>
@@ -187,11 +355,28 @@ function Home(){
       <section className="container reveal">
         <h3>Why Phoenix</h3>
         <div className="features">
-          <div className="feature reveal"><div className="icon"><ShieldCheck size={20}/></div><h4>Built to Last</h4><p className="h-sub">Industrial-grade materials, quality welds, and rigorous QA.</p></div>
-          <div className="feature reveal"><div className="icon"><Wrench size={20}/></div><h4>Custom Fabrication</h4><p className="h-sub">Tailored solutions for your application and region.</p></div>
-          <div className="feature reveal"><div className="icon"><Factory size={20}/></div><h4>Canadian Made</h4><p className="h-sub">Designed and manufactured for Canadian conditions.</p></div>
-          <div className="feature reveal"><div className="icon"><Truck size={20}/></div><h4>Fast Turnarounds</h4><p className="h-sub">Responsive builds with dependable delivery.</p></div>
+          <div className="feature reveal">
+            <div className="icon"><ShieldCheck size={20}/></div>
+            <h4>Built to Last</h4>
+            <p className="h-sub">Industrial-grade materials, quality welds, and rigorous QA.</p>
+          </div>
+          <div className="feature reveal">
+            <div className="icon"><Wrench size={20}/></div>
+            <h4>Custom Fabrication</h4>
+            <p className="h-sub">Tailored solutions for your application and region.</p>
+          </div>
+          <div className="feature reveal">
+            <div className="icon"><Factory size={20}/></div>
+            <h4>Canadian Made</h4>
+            <p className="h-sub">Designed and manufactured for Canadian conditions.</p>
+          </div>
+          <div className="feature reveal">
+            <div className="icon"><Truck size={20}/></div>
+            <h4>Fast Turnarounds</h4>
+            <p className="h-sub">Responsive builds with dependable delivery.</p>
+          </div>
         </div>
+
       </section>
 
       <section className="container reveal">
@@ -229,12 +414,39 @@ function ImgCard({title, src}){
 // ---- Products ----
 function Products(){
   const [items, setItems] = useState([]);
-  useEffect(() => { (async () => {
-    try{ const {data} = await api.get("/products"); setItems(data);}catch(err){ console.error(err);} })(); }, []);
+  
+  useEffect(() => { 
+    (async () => {
+      try{ 
+        const {data} = await api.get("/products"); 
+        console.log("Products loaded:", data);
+        setItems(data);
+      }catch(err){ 
+        console.error("Error loading products:", err);
+      } 
+    })(); 
+  }, []);
+  
+  // Force scroll animation refresh when items change
+  useEffect(() => {
+    if (items.length > 0) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        const els = document.querySelectorAll('.reveal, .slide-left, .slide-right');
+        els.forEach((el) => {
+          if (el.classList.contains('reveal')) {
+            el.classList.add('is-visible');
+          }
+        });
+      }, 100);
+    }
+  }, [items]);
+  
   return (
     <Shell>
-      <div className="container">
-        <h2>Products</h2>
+      <div className="section container reveal">
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Products</h2>
+        <p className="lead">Browse our complete collection of custom trailers and equipment</p>
         <div className="grid" style={{marginTop:16}}>
           {items.map(p => (
             <ProductCard key={p.id} p={p} />
@@ -249,7 +461,32 @@ function ProductCard({p}){
   const nav = useNavigate();
   return (
     <div className="card reveal" onClick={()=>nav(`/products/${p.id}`)} style={{cursor:'pointer'}}>
-      {p.images?.[0] && <img src={p.images[0]} alt={p.title}/>}<h4>{p.title}</h4>
+      {p.images?.[0] ? (
+        <img 
+          src={p.images[0]} 
+          alt={p.title}
+          onError={(e) => {
+            console.error(`Failed to load image in card: ${p.images[0]}`);
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'block';
+          }}
+        />
+      ) : (
+        <div style={{
+          width: '100%', 
+          height: '200px', 
+          background: '#f3f4f6', 
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#6b7280',
+          fontSize: '14px'
+        }}>
+          No Image
+        </div>
+      )}
+      <h4>{p.title}</h4>
       <p>{p.description}</p>
     </div>
   )
@@ -258,23 +495,156 @@ function ProductCard({p}){
 function ProductDetail(){
   const {id} = useParams();
   const [p, setP] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const auth = useAuth();
   const nav = useNavigate();
-  useEffect(()=>{ (async()=>{ try{ const {data}=await api.get(`/products/${id}`); setP(data);}catch(e){ console.error(e);} })(); },[id]);
-  const del = async ()=>{ if(!window.confirm("Delete this product?")) return; try{ await api.delete(`/products/${id}`, {headers: auth.headers}); nav('/products'); }catch(e){ alert('Delete failed'); }}
-  if(!p) return <Shell><div className="container"><p>Loading...</p></div></Shell>
+  
+  console.log("ProductDetail rendered with id:", id);
+  
+  useEffect(()=>{ 
+    console.log("ProductDetail useEffect triggered for id:", id);
+    (async()=>{ 
+      try{ 
+        setLoading(true);
+        console.log("Fetching product data...");
+        const {data} = await api.get(`/products/${id}`); 
+        console.log("Product detail loaded:", data);
+        setP(data);
+      }catch(e){ 
+        console.error("Error loading product:", e);
+        setError(e.message || "Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    })(); 
+  },[id]);
+  
+  const del = async ()=>{ 
+    if(!window.confirm("Delete this product?")) return; 
+    try{ 
+      await api.delete(`/products/${id}`, {headers: auth.headers}); 
+      nav('/products'); 
+    }catch(e){ 
+      alert('Delete failed'); 
+    } 
+  }
+  
+  console.log("ProductDetail render state:", { loading, error, product: p });
+  
+  if(loading) {
+    console.log("Showing loading state");
+    return (
+      <Shell>
+        <div className="container">
+          <p>Loading product...</p>
+          <button onClick={() => nav('/products')}>Back to Products</button>
+        </div>
+      </Shell>
+    );
+  }
+  
+  if(error) {
+    console.log("Showing error state:", error);
+    return (
+      <Shell>
+        <div className="container">
+          <p>Error: {error}</p>
+          <button onClick={() => nav('/products')}>Back to Products</button>
+        </div>
+      </Shell>
+    );
+  }
+  
+  if(!p) {
+    console.log("No product data");
+    return (
+      <Shell>
+        <div className="container">
+          <p>Product not found</p>
+          <button onClick={() => nav('/products')}>Back to Products</button>
+        </div>
+      </Shell>
+    );
+  }
+  
+  console.log("Rendering product:", p);
+  console.log("About to return JSX for product:", p.title);
+  
   return (
     <Shell>
-      <div className="container">
-        <h2 className="reveal">{p.title}</h2>
-        <div className="gallery" style={{marginTop:12}}>
-          {(p.images||[]).map((u,i)=> (<img className="reveal" key={i} src={u} alt={`${p.title} ${i+1}`} />))}
+      <div className="container" style={{padding: '40px 24px'}}>
+        <div style={{marginBottom: '24px'}}>
+          <button 
+            className="btn secondary" 
+            onClick={() => nav('/products')}
+            style={{fontSize: '14px', padding: '8px 16px'}}
+          >
+            ← Back to Products
+          </button>
         </div>
-        <p style={{marginTop:16}} className="reveal">{p.description}</p>
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--text)' }}>{p.title}</h2>
+        <p style={{ fontSize: '1.2rem', color: 'var(--muted)', marginBottom: '2rem' }}>{p.description}</p>
+        
+
+        
+        {p.images && p.images.length > 0 ? (
+          <div className="gallery">
+            {console.log(`Product ${p.title} images:`, p.images)}
+            {p.images.map((u,i)=> (
+              <div key={i} style={{position: 'relative'}}>
+                <img 
+                  src={u} 
+                  alt={`${p.title} ${i+1}`} 
+                  style={{
+                    width: '100%',
+                    height: '220px',
+                    objectFit: 'cover',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border)',
+                    display: 'block'
+                  }}
+                  onError={(e) => {
+                    console.error(`Failed to load image: ${u}`);
+                    e.target.style.display = 'none';
+                    // Show error placeholder
+                    const placeholder = document.createElement('div');
+                    placeholder.innerHTML = 'Image failed to load';
+                    placeholder.style.cssText = `
+                      width: 100%;
+                      height: 220px;
+                      background: #f3f4f6;
+                      border: 1px solid #e5e7eb;
+                      border-radius: 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      color: #6b7280;
+                    `;
+                    e.target.parentNode.appendChild(placeholder);
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{
+            background: '#f3f4f6', 
+            border: '1px solid #e5e7eb',
+            borderRadius: '12px',
+            padding: '40px',
+            textAlign: 'center',
+            color: '#6b7280',
+            marginTop: '12px'
+          }}>
+            No images available
+          </div>
+        )}
+        
         {auth.isAuthed && (
-          <div style={{marginTop:16, display:'flex', gap:12}} className="reveal">
-            <Link className="btn secondary" to={`/products/${id}/edit`}>Edit</Link>
-            <button className="btn" onClick={del}>Delete</button>
+          <div style={{marginTop:32, display:'flex', gap:12, justifyContent:'center'}}>
+            <Link className="btn secondary" to={`/products/${id}/edit`}>Edit Product</Link>
+            <button className="btn" onClick={del}>Delete Product</button>
           </div>
         )}
       </div>
@@ -481,7 +851,7 @@ function AddProduct(){
 function Section({title, lead, images=[]}){
   return (
     <div className="section container reveal">
-      <h2>{title}</h2>
+      <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>{title}</h2>
       {lead && <p className="lead">{lead}</p>}
       {images.length>0 && (
         <div className="gallery">
@@ -499,16 +869,67 @@ function Flatbeds(){
     `${BACKEND_URL}/uploads/migrated/image_fa261e90.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_3398b663.jpg`,
   ];
-  return <Shell><Section title="Flatbeds" lead="Drive efficiently and securely with our flatbeds" images={imgs}/></Shell>
+  return (
+    <Shell>
+      <div className="section container reveal">
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Flatbeds</h2>
+        <p className="lead">Drive efficiently and securely with our flatbeds</p>
+        
+        {/* 3D Model Viewer - Floating above images */}
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          <Trailer3DViewer 
+            key="flatbeds-3d"
+            modelPath={`${BACKEND_URL}/uploads/1b6e11f42215726e1c34833c13101abe.fbx`}
+            width={500}
+            height={250}
+            zoom={5.0}
+          />
+        </div>
+        
+        <div className="gallery">
+          {imgs.map((u,i)=>(<img className="reveal" key={i} src={u} alt={`Flatbed ${i+1}`} />))}
+        </div>
+      </div>
+    </Shell>
+  )
 }
 function DropDecks(){
   const imgs=[
     `${BACKEND_URL}/uploads/migrated/image_65c884e6.jpg`,
+    `${BACKEND_URL}/uploads/IMG_4800-1.webp`, // Second image
     `${BACKEND_URL}/uploads/migrated/image_542c7abf.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_abdea658.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_09c5bb7b.jpg`,
+    `${BACKEND_URL}/uploads/IMG_4362 (1).webp`,
+    `${BACKEND_URL}/uploads/IMG_4093.webp`, // Next to current second last
+    // Added to the end
+    `${BACKEND_URL}/uploads/IMG_4365.webp`,
+    `${BACKEND_URL}/uploads/IMG_2053.webp`,
+    `${BACKEND_URL}/uploads/IMG_2059.webp`,
   ];
-  return <Shell><Section title="Drop Decks" lead="High-performance drop decks for easy loading and maximum stability" images={imgs}/></Shell>
+  return (
+    <Shell>
+      <div className="section container reveal">
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Drop Decks</h2>
+        <p className="lead">High-performance drop decks for easy loading and maximum stability</p>
+        
+        {/* 3D Model Viewer - Floating above images */}
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          <Trailer3DViewer 
+            key="dropdecks-3d"
+            modelPath={`${BACKEND_URL}/uploads/dropdeck3d.fbx`}
+            width={500}
+            height={250}
+            zoom={5.0}
+          />
+        </div>
+        
+        <div className="gallery">
+          {imgs.map((u,i)=>(<img className="reveal" key={i} src={u} alt={`Drop Deck ${i+1}`} />))}
+        </div>
+      </div>
+    </Shell>
+  )
 }
 function TruckDecks(){
   const imgs=[
@@ -516,7 +937,29 @@ function TruckDecks(){
     `${BACKEND_URL}/uploads/migrated/image_93076e07.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_f9c4cf8a.jpg`,
   ];
-  return <Shell><Section title="Truck Decks" lead="Truck decks designed for heavy-duty hauling and seamless integration" images={imgs}/></Shell>
+  return (
+    <Shell>
+      <div className="section container reveal">
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Truck Decks</h2>
+        <p className="lead">Truck decks designed for heavy-duty hauling and seamless integration</p>
+        
+        {/* 3D Model Viewer - Floating above images */}
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          <Trailer3DViewer 
+            key="truckdecks-3d"
+            modelPath={`${BACKEND_URL}/uploads/2b562ac159eb3c6a12abc4e72e677896.fbx`}
+            width={500}
+            height={250}
+            zoom={3.5}
+          />
+        </div>
+        
+        <div className="gallery">
+          {imgs.map((u,i)=>(<img className="reveal" key={i} src={u} alt={`Truck Deck ${i+1}`} />))}
+        </div>
+      </div>
+    </Shell>
+  )
 }
 function ControlVans(){
   const imgs=[
@@ -529,7 +972,29 @@ function ControlVans(){
     `${BACKEND_URL}/uploads/IMG_1387-1-rotated.webp`,
     `${BACKEND_URL}/uploads/IMG_5134.webp`,
   ];
-  return <Shell><Section title="Control Vans" lead="Control vans equipped for optimal operation and versatility" images={imgs}/></Shell>
+  return (
+    <Shell>
+      <div className="section container reveal">
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Control Vans</h2>
+        <p className="lead">Control vans equipped for optimal operation and versatility</p>
+        
+        {/* 3D Model Viewer - Floating above images */}
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          <Trailer3DViewer 
+            key="controlvans-3d"
+            modelPath={`${BACKEND_URL}/uploads/controlvan3d2.fbx`}
+            width={500}
+            height={250}
+            zoom={5.0}
+          />
+        </div>
+        
+        <div className="gallery">
+          {imgs.map((u,i)=>(<img className="reveal" key={i} src={u} alt={`Control Van ${i+1}`} />))}
+        </div>
+      </div>
+    </Shell>
+  )
 }
 function CustomBuilds(){
   const imgs=[
@@ -540,6 +1005,11 @@ function CustomBuilds(){
     `${BACKEND_URL}/uploads/migrated/image_f2f89d30.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_adc1ada8.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_37e620b6.jpg`,
+    // Your new custom build images
+    `${BACKEND_URL}/uploads/IMG_2400.webp`,
+    `${BACKEND_URL}/uploads/IMG_2406.webp`,
+    `${BACKEND_URL}/uploads/IMG_4868 (1).webp`,
+    `${BACKEND_URL}/uploads/IMG_4873.webp`,
   ];
   return (
     <Shell>
@@ -566,9 +1036,60 @@ function CustomBuilds(){
 function About(){
   return (
     <Shell>
+      {/* Hero Section with Video */}
+      <section className="hero" style={{
+        minHeight: '70vh',
+        padding: '120px 0 80px 0',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {/* Background Video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 1
+          }}
+          src={`${BACKEND_URL}/uploads/Flatbed_Company_Cinematic_Ad.mp4`}
+        />
+        
+        {/* Dark overlay for better text readability */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(135deg, rgba(15,20,26,0.8) 0%, rgba(15,20,26,0.6) 50%, rgba(15,20,26,0.4) 100%)',
+          zIndex: 2
+        }} />
+        
+        {/* Hero Content */}
+        <div className="container" style={{position: 'relative', zIndex: 3, textAlign: 'center'}}>
+          <div className="reveal" style={{maxWidth: 800, margin: '0 auto'}}>
+            <h1 style={{fontSize: '3.5rem', lineHeight: '1.2', marginBottom: '2rem', color: '#fff'}}>
+              Serving Canadians Since 2020
+            </h1>
+            <p style={{fontSize: '1.3rem', color: 'rgba(255,255,255,0.9)', marginBottom: '2rem'}}>
+              Founded in 2020, Phoenix Manufacturing is a proudly Canadian-owned company stemming from RPM Truck & Trailer Repair (est. 1991). We design and build specialized trailer solutions with craftsmanship and customer focus.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
       <div className="section container reveal">
-        <h2>Serving Canadians Since 2020</h2>
-        <p className="lead">Founded in 2020, Phoenix Manufacturing is a proudly Canadian-owned company stemming from RPM Truck & Trailer Repair (est. 1991). We design and build specialized trailer solutions with craftsmanship and customer focus.</p>
         <img className="reveal" style={{width:'100%', borderRadius:12, marginTop:12}} src={`${BACKEND_URL}/uploads/migrated/image_1127fa83.jpg`} alt="Shop"/>
         <h3 style={{marginTop:20}}>Our Team</h3>
         <ul style={{marginTop:8, color:'var(--muted)'}}>
@@ -586,7 +1107,7 @@ function Contact(){
   return (
     <Shell>
       <div className="section container reveal">
-        <h2>Contact Us</h2>
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Contact Us</h2>
         <p className="lead">Whether you’re looking for more information or a quote, we’d love to hear from you.</p>
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
           <div className="form reveal">
@@ -610,8 +1131,8 @@ function Contact(){
 function Dealers(){
   return (
     <Shell>
-      <div className="section container reveal">
-        <h2>Our Dealers</h2>
+              <div className="section container reveal">
+          <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Our Dealers</h2>
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
           <div className="form reveal">
             <h3>Calgary</h3>

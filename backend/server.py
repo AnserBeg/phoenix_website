@@ -215,8 +215,9 @@ async def upload_file(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    # Return the URL to access the file
-    return {"filename": unique_filename, "url": f"/uploads/{unique_filename}"}
+    # Return the full URL to access the file
+    backend_url = "http://localhost:8000"
+    return {"filename": unique_filename, "url": f"{backend_url}/uploads/{unique_filename}"}
 
 # Debug endpoint to check uploads directory
 @api_router.get("/debug/uploads")
