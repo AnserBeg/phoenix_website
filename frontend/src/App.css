@@ -77,8 +77,8 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 
 /* Hero content and buttons */
 .hero-content{text-align:left; max-width:600px; z-index:10; display:flex; flex-direction:column; gap:24px}
-.hero-content h1{font-size:52px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; color:#fff; margin:0; display:block}
-.hero-subtitle{font-size:20px; line-height:1.4; color:rgba(255,255,255,0.9); margin:0; max-width:500px; display:block}
+.hero-content h1{font-size:52px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; color:#fff; margin:0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hero-subtitle{font-size:20px; line-height:1.4; color:rgba(255,255,255,0.9); margin:0; max-width:500px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .hero-buttons{display:flex; gap:20px; flex-wrap:wrap; align-items:center; margin-top:8px}
 
 /* Cards */
