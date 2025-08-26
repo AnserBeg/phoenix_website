@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 import os
 import logging
 from pathlib import Path
@@ -237,6 +238,10 @@ app.include_router(api_router)
 print(f"Mounting static files from: {UPLOADS_DIR.absolute()}")
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR.absolute())), name="uploads")
 
+# Enable compression for faster transfers
+app.add_middleware(GZipMiddleware, minimum_size=500)
+
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -244,6 +249,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add long-lived caching for uploaded static assets (images/videos/models)
+@app.middleware("http")
+async def add_uploads_cache_headers(request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith("/uploads/") and response.status_code == 200:
+        # One year immutable cache for versioned assets
+        response.headers.setdefault(
+            "Cache-Control", "public, max-age=31536000, immutable"
+        )
+    return response
 
 # Configure logging
 logging.basicConfig(
