@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -18,7 +18,7 @@ const USER_FEATURED = [
   { key: 'drop-deck', title: "Drop Deck Ramp", src: `${BACKEND_URL}/uploads/migrated/image_da077c5a.jpg`, desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment loading.", link: "/drop-decks" },
   { key: 'towable', title: "Towable Screen", src: `${BACKEND_URL}/uploads/migrated/image_06b6a17d.jpg`, desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
   { key: 'utility', title: "Utility Trailer", src: `${BACKEND_URL}/uploads/migrated/image_d43cb4b8.jpg`, desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/custom" },
-  { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/custom" },
+  { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, src2: `${BACKEND_URL}/uploads/migrated/image_ff2a7939_2.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/custom" },
   { key: 'control-van', title: "Control Van", src: `${BACKEND_URL}/uploads/migrated/image_f595beb2.jpg`, desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
 ];
 
@@ -119,6 +119,95 @@ function Shell({ children }){
 
       {children}
       <Footer />
+    </div>
+  );
+}
+
+// -------------- Custom Components --------------
+function ToggleImageCard({ item }) {
+  const [showingSecond, setShowingSecond] = useState(false);
+  const [animId, setAnimId] = useState(null);
+  const overlayRef = useRef(null);
+
+  const clip = (p) => `inset(0 ${100 - p * 100}% 0 0)`;
+
+  const animate = (from, to) => {
+    if (animId) cancelAnimationFrame(animId);
+    const dur = 800; // ms
+    const start = performance.now();
+    const step = (t) => {
+      const e = Math.min(1, (t - start) / dur);
+      const eased = from + (to - from) * (1 - Math.pow(1 - e, 3)); // easeOutCubic
+      if (overlayRef.current) {
+        overlayRef.current.style.clipPath = clip(eased);
+      }
+      if (e < 1) {
+        const newAnimId = requestAnimationFrame(step);
+        setAnimId(newAnimId);
+      }
+    };
+    const newAnimId = requestAnimationFrame(step);
+    setAnimId(newAnimId);
+  };
+
+  const handleToggle = () => {
+    if (showingSecond) {
+      animate(1, 0); // hide overlay -> show base
+    } else {
+      animate(0, 1); // show overlay fully -> replace base
+    }
+    setShowingSecond(!showingSecond);
+  };
+
+  // Cleanup animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, [animId]);
+
+  return (
+    <div className="featured-item reveal">
+      <div className="wipe-wrap">
+        {/* Base image (first version) */}
+        <OptimizedImage 
+          src={item.src} 
+          alt={item.title}
+          loading="lazy"
+        />
+        {/* Overlay image (second version) */}
+        <div className="wipe-overlay" ref={overlayRef}>
+          <OptimizedImage 
+            src={item.src2} 
+            alt={`${item.title} - View 2`}
+            loading="lazy"
+          />
+        </div>
+      </div>
+      <div className="featured-content">
+        <h3>{item.title}</h3>
+        <p>{item.desc}</p>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Link to={item.link} className="btn btn-outline">
+            Learn More <ArrowRight size={16} />
+          </Link>
+          <button 
+            onClick={handleToggle}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              background: '#fff',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151'
+            }}
+          >
+            {showingSecond ? 'View 1' : 'View 2'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -283,20 +372,24 @@ function Home(){
         <h2>Featured Solutions</h2>
         <div className="featured-grid">
           {USER_FEATURED.map((item) => (
-            <div key={item.key} className="featured-item reveal">
-              <OptimizedImage 
-                src={item.src} 
-                alt={item.title}
-                loading="lazy" // Lazy load images
-              />
-              <div className="featured-content">
-                <h3>{item.title}</h3>
-                <p>{item.desc}</p>
-                <Link to={item.link} className="btn btn-outline">
-                  Learn More <ArrowRight size={16} />
-                </Link>
+            item.key === 'tanks' ? (
+              <ToggleImageCard key={item.key} item={item} />
+            ) : (
+              <div key={item.key} className="featured-item reveal">
+                <OptimizedImage 
+                  src={item.src} 
+                  alt={item.title}
+                  loading="lazy" // Lazy load images
+                />
+                <div className="featured-content">
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                  <Link to={item.link} className="btn btn-outline">
+                    Learn More <ArrowRight size={16} />
+                  </Link>
+                </div>
               </div>
-            </div>
+            )
           ))}
         </div>
       </section>

@@ -139,6 +139,33 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .featured-content h3{margin:0 0 8px 0; color:var(--text)}
 .featured-content p{color:var(--muted); margin-bottom:16px; line-height:1.5}
 
+/* Wipe animation for toggle images */
+.wipe-wrap {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #fff;
+}
+.wipe-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #fff;
+}
+.wipe-overlay {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 100% 0 0);
+  will-change: clip-path;
+  background: #fff;
+}
+.wipe-overlay img {
+  background: #fff;
+}
+
 /* Responsive */
 @media (max-width: 960px){
   .nav-links{display:none}
