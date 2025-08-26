@@ -58,6 +58,11 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .hero .h-title{color:#fff}
 .hero .cta .btn.secondary{background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.5)}
 
+/* Hero buttons - ensure they're visible on dark background */
+.hero .btn.primary{background:var(--brand); color:black; border:1px solid var(--brand)}
+.hero .btn.secondary{background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.5)}
+.hero .btn.secondary:hover{background:rgba(255,255,255,0.1); color:#fff; border-color:#fff}
+
 /* Buttons */
 .btn{background:var(--brand); border:none; color:black; padding:14px 20px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow:0 6px 18px rgba(255,122,0,0.18)}
 .btn:hover{transform:translateY(-1px); box-shadow:0 10px 28px rgba(255,122,0,0.25)}
