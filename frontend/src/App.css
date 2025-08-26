@@ -173,7 +173,7 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 @media (max-width: 960px){
   .nav-links{display:none}
   .hamburger{display:inline-flex}
-  .desk-hamburger{display:none}
+  .desk-hamburger{display:none !important}
   .grid{grid-template-columns:1fr 1fr}
   .gallery{grid-template-columns:1fr 1fr}
   .features{grid-template-columns:1fr 1fr}
