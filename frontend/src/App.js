@@ -3,7 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { ShieldCheck, Wrench, Factory, Truck, Sparkles, MapPin, Phone, Mail, ArrowRight, Menu, X } from "lucide-react";
-import { ThreeDBackground } from "./components/3DAnimation.jsx";
+// import { ThreeDBackground } from "./components/3DAnimation.jsx";
 import { Trailer3DViewer } from "./components/3DModelViewer.jsx";
 import { Footer } from "./components/Footer.jsx";
 import { OptimizedImage, OptimizedVideo } from "./components/OptimizedImage.jsx";
@@ -182,14 +182,14 @@ function Home(){
 
   return (
     <Shell>
-      <ThreeDBackground style={{
+      {/* <ThreeDBackground style={{
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%',
         zIndex: -1
-      }} />
+      }} /> */}
       <section className="hero" style={{
         minHeight: '100vh',
         padding: '120px 0 80px 0',
