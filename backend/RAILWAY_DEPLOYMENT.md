@@ -27,8 +27,15 @@
 2. **Click "New Project"**
 3. **Choose "Deploy from GitHub repo"**
 4. **Select your repository** (`phoenix_website`)
-5. **Set the root directory** to `backend`
+5. **⚠️ IMPORTANT: Set the root directory to `backend`**
 6. **Click "Deploy Now"**
+
+**Note**: If Railway still can't detect the Python app, try this alternative approach:
+1. **Create a new project** in Railway
+2. **Choose "Deploy from GitHub repo"**
+3. **Select your repository** (`phoenix_website`)
+4. **Set root directory to `backend`**
+5. **If it still fails, try deploying the entire repo first, then configure the service**
 
 ### Option B: Deploy via Railway CLI
 
@@ -112,6 +119,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES=10080
 - **PORT**: Automatically set by Railway
 
 ## Troubleshooting
+
+### Railway Can't Detect Python App
+**Error**: "Railpack could not determine how to build the app"
+
+**Solutions**:
+1. **Ensure root directory is set to `backend`** (not the entire repo)
+2. **Check that `server.py` exists in the backend directory**
+3. **Verify `requirements.txt` is in the backend directory**
+4. **Try deploying the entire repo first, then configure the service**
 
 ### Build Errors
 - **Check Python version**: Railway uses Python 3.9
