@@ -1,0 +1,12 @@
+# Simple Railway nixpacks configuration for Python FastAPI app
+[phases.setup]
+nixPkgs = ["python39", "python39Packages.pip"]
+
+[phases.install]
+cmds = ["pip install --user -r requirements.txt"]
+
+[phases.build]
+cmds = ["echo 'Python FastAPI app build complete'"]
+
+[start]
+cmd = "uvicorn server:app --host 0.0.0.0 --port $PORT"
