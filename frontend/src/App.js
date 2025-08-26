@@ -168,22 +168,22 @@ function ToggleImageCard({ item }) {
 
   return (
     <div className="featured-item reveal">
-      <div className="wipe-wrap">
-        {/* Base image (first version) */}
-        <OptimizedImage 
-          src={item.src} 
-          alt={item.title}
-          loading="lazy"
-        />
-        {/* Overlay image (second version) */}
-        <div className="wipe-overlay" ref={overlayRef}>
-          <OptimizedImage 
-            src={item.src2} 
-            alt={`${item.title} - View 2`}
+              <div className="wipe-wrap">
+          {/* Base image (first version) */}
+          <img 
+            src={item.src} 
+            alt={item.title}
             loading="lazy"
           />
+          {/* Overlay image (second version) */}
+          <div className="wipe-overlay" ref={overlayRef}>
+            <img 
+              src={item.src2} 
+              alt={`${item.title} - View 2`}
+              loading="lazy"
+            />
+          </div>
         </div>
-      </div>
       <div className="featured-content">
         <h3>{item.title}</h3>
         <p>{item.desc}</p>
@@ -898,7 +898,7 @@ function Flatbeds(){
     `${BACKEND_URL}/uploads/migrated/image_fa261e90.jpg`,
     `${BACKEND_URL}/uploads/migrated/image_3398b663.jpg`,
     `${BACKEND_URL}/uploads/IMG_5178.jpg`,
-    `${BACKEND_URL}/uploads/IMG_5180 (1).jpg`,
+    `${BACKEND_URL}/uploads/IMG_5180%20(1).jpg`,
   ];
   return (
     <Shell>
