@@ -218,6 +218,7 @@ function Home(){
   const [heroY, setHeroY] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [inStockProducts, setInStockProducts] = useState([]);
   
   // Hero carousel media - images and video (using optimized files)
   const heroMedia = [
@@ -263,6 +264,20 @@ function Home(){
       clearTimeout(changeTimer);
     };
   }, [currentMediaIndex, heroMedia.length]);
+
+  // Fetch in-stock products
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await api.get("/products");
+        // Take up to 3 products
+        setInStockProducts(data.slice(0, 3));
+      } catch (err) {
+        console.error("Error loading in-stock products:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
   
   // Manual navigation
   const goToMedia = (index) => {
@@ -367,6 +382,45 @@ function Home(){
           </div>
         </div>
       </section>
+
+      {/* In Stock Equipment */}
+      {inStockProducts.length > 0 && (
+        <section className="featured container reveal">
+          <h2>In Stock Equipment</h2>
+          <div className="featured-grid">
+            {inStockProducts.map((product) => (
+              <div key={product.id} className="featured-item reveal">
+                {product.images && product.images.length > 0 ? (
+                  <OptimizedImage 
+                    src={`${BACKEND_URL}/uploads/${product.images[0]}`}
+                    alt={product.title}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div style={{ 
+                    width: '100%', 
+                    height: '200px', 
+                    background: '#f3f4f6', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    color: '#6b7280'
+                  }}>
+                    No Image
+                  </div>
+                )}
+                <div className="featured-content">
+                  <h3>{product.title}</h3>
+                  <p>{product.description}</p>
+                  <Link to={`/products/${product.id}`} className="btn btn-outline">
+                    View Details <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured Products */}
       <section className="featured container reveal">
