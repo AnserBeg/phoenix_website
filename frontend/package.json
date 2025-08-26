@@ -60,6 +60,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
