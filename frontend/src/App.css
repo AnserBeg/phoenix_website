@@ -68,6 +68,13 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .btn:hover{transform:translateY(-1px); box-shadow:0 10px 28px rgba(255,122,0,0.25)}
 .btn.secondary{background:transparent; color:var(--text); border:1px solid var(--border)}
 .btn.secondary:hover{background:#f3f4f6}
+.btn.outline:hover{background:var(--brand); color:black; transform:translateY(-1px); box-shadow:0 6px 18px rgba(255,122,0,0.18)}
+
+/* Hero content and buttons */
+.hero-content{text-align:left; max-width:600px; z-index:10}
+.hero-content h1{font-size:52px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; color:#fff; margin:0 0 16px 0}
+.hero-subtitle{font-size:20px; line-height:1.4; color:rgba(255,255,255,0.9); margin:0 0 32px 0; max-width:500px}
+.hero-buttons{display:flex; gap:16px; flex-wrap:wrap; align-items:center}
 
 /* Cards */
 .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px}
