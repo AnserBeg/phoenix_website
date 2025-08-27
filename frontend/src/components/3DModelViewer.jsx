@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -12,6 +13,7 @@ export function Trailer3DViewer({ modelPath, width = 400, height = 300, zoom = 1
   const controlsRef = useRef(null);
   const modelRef = useRef(null);
   const animationIdRef = useRef(null);
+  const dracoLoaderRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -186,6 +188,14 @@ export function Trailer3DViewer({ modelPath, width = 400, height = 300, zoom = 1
     } else {
       // Load GLB/GLTF file
       const gltfLoader = new GLTFLoader();
+      
+      // Configure DRACO loader for compressed models
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+      dracoLoader.setDecoderConfig({ type: 'js' });
+      gltfLoader.setDRACOLoader(dracoLoader);
+      dracoLoaderRef.current = dracoLoader;
+      
       gltfLoader.load(
         modelPath,
         (gltf) => {
@@ -313,6 +323,12 @@ export function Trailer3DViewer({ modelPath, width = 400, height = 300, zoom = 1
       // Clear container
       if (container && container.firstChild) {
         container.innerHTML = '';
+      }
+      
+      // Dispose DRACO loader
+      if (dracoLoaderRef.current) {
+        dracoLoaderRef.current.dispose();
+        dracoLoaderRef.current = null;
       }
     };
   }, [modelPath, width, height, zoom]);
