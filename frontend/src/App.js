@@ -1114,7 +1114,7 @@ function TruckDecks(){
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <Trailer3DViewer 
             key="truckdecks-3d"
-            modelPath={`${BACKEND_URL}/uploads/ultra_compressed_models/ultra_truckdeck3d.glb`}
+            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_1b6e11f42215726e1c34833c13101abe.glb`}
             width={500}
             height={250}
             zoom={1.0}
