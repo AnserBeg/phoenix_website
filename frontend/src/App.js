@@ -545,7 +545,7 @@ function ProductCard({p}){
     <div className="card reveal" onClick={()=>nav(`/products/${p.id}`)} style={{cursor:'pointer'}}>
       {p.images?.[0] ? (
         <OptimizedImage 
-          src={p.images[0]} 
+          src={p.images[0].includes('http') ? p.images[0] : `${BACKEND_URL}/uploads/${p.images[0]}`} 
           alt={p.title}
           loading="lazy" // Lazy load images
           onError={(e) => {
