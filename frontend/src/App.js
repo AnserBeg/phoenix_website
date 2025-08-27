@@ -10,6 +10,10 @@ import { OptimizedImage, OptimizedVideo } from "./components/OptimizedImage.jsx"
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"; // Use environment variable or fallback to localhost
 const API = `${BACKEND_URL}/api`;
+
+// Debug: Log the backend URL being used
+console.log("Backend URL:", BACKEND_URL);
+console.log("API URL:", API);
 const HERO_BG = `${BACKEND_URL}/uploads/migrated/image_38bef026.jpg`;
 const LOGO = `${BACKEND_URL}/uploads/migrated/phoenix_logo_3264f6df.svg`;
 
@@ -266,22 +270,31 @@ function Home(){
   }, [currentMediaIndex, heroMedia.length]);
 
   // Fetch in-stock products
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
+  useEffect(() => { 
+    (async () => {
+      try { 
         console.log("Fetching in-stock products...");
-        const { data } = await api.get("/products");
-        console.log("Products fetched:", data);
-        // Take up to 3 products
-        const limitedProducts = data.slice(0, 3);
-        console.log("Limited to 3 products:", limitedProducts);
-        setInStockProducts(limitedProducts);
-      } catch (err) {
+        console.log("API endpoint:", `${API}/products`);
+        
+        const {data} = await api.get("/products"); 
+        console.log("Products loaded:", data);
+        
+        // Check if data is an array
+        if (Array.isArray(data)) {
+          console.log("Data is array, length:", data.length);
+          // Take up to 3 products
+          const limitedProducts = data.slice(0, 3);
+          console.log("Limited to 3 products:", limitedProducts);
+          setInStockProducts(limitedProducts);
+        } else {
+          console.log("Data is not an array:", typeof data);
+          setInStockProducts([]);
+        }
+      } catch (err) { 
         console.error("Error loading in-stock products:", err);
         setInStockProducts([]);
-      }
-    };
-    fetchProducts();
+      } 
+    })(); 
   }, []);
   
   // Manual navigation
@@ -391,6 +404,23 @@ function Home(){
       {/* In Stock Equipment */}
       <section className="featured container reveal">
         <h2>In Stock Equipment</h2>
+        
+        {/* Debug info - remove this later */}
+        <div style={{ 
+          background: '#f0f9ff', 
+          border: '1px solid #0ea5e9', 
+          borderRadius: '8px', 
+          padding: '16px', 
+          marginBottom: '24px',
+          fontSize: '14px'
+        }}>
+          <strong>Debug Info:</strong><br/>
+          Products count: {inStockProducts.length}<br/>
+          Backend URL: {BACKEND_URL}<br/>
+          API URL: {API}<br/>
+          Products: {JSON.stringify(inStockProducts, null, 2)}
+        </div>
+        
         {inStockProducts.length > 0 ? (
           <>
             <div className="featured-grid">
