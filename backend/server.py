@@ -17,10 +17,39 @@ import shutil
 UPLOADS_DIR = Path(__file__).parent / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
 
-# In-memory storage (data will be lost when server restarts)
-users_db = {}
-products_db = {}
-status_checks_db = []
+# Persistent storage using JSON files
+import json
+
+# File paths for persistent storage
+DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR.mkdir(exist_ok=True)
+
+USERS_FILE = DATA_DIR / "users.json"
+PRODUCTS_FILE = DATA_DIR / "products.json"
+STATUS_FILE = DATA_DIR / "status.json"
+
+def load_json_data(file_path):
+    """Load data from JSON file"""
+    if file_path.exists():
+        try:
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_json_data(file_path, data):
+    """Save data to JSON file"""
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2, default=str)
+    except Exception as e:
+        print(f"Error saving to {file_path}: {e}")
+
+# Load existing data or create empty storage
+users_db = load_json_data(USERS_FILE)
+products_db = load_json_data(PRODUCTS_FILE)
+status_checks_db = load_json_data(STATUS_FILE)
 
 # Create default user
 default_user = {
@@ -116,6 +145,7 @@ async def root():
 async def create_status_check(input: StatusCheckCreate):
     status_obj = StatusCheck(**input.dict())
     status_checks_db.append(status_obj.dict())
+    save_json_data(STATUS_FILE, status_checks_db)
     return status_obj
 
 
@@ -136,6 +166,7 @@ async def register(payload: UserCreate):
         "created_at": datetime.utcnow(),
     }
     users_db[payload.email] = user
+    save_json_data(USERS_FILE, users_db)
     token = create_access_token({"sub": user["id"], "email": user["email"]})
     return TokenResponse(access_token=token)
 
@@ -183,6 +214,7 @@ async def get_product(product_id: str):
 async def create_product(product: ProductCreate, user=Depends(require_auth)):
     prod = Product(**product.dict())
     products_db[prod.id] = prod.dict()
+    save_json_data(PRODUCTS_FILE, products_db)
     return prod
 
 
@@ -193,6 +225,7 @@ async def update_product(product_id: str, product: ProductCreate, user=Depends(r
     now = datetime.utcnow()
     update_doc = {**product.dict(), "id": product_id, "updated_at": now}
     products_db[product_id] = update_doc
+    save_json_data(PRODUCTS_FILE, products_db)
     return Product(**update_doc)
 
 
@@ -201,6 +234,7 @@ async def delete_product(product_id: str, user=Depends(require_auth)):
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
     del products_db[product_id]
+    save_json_data(PRODUCTS_FILE, products_db)
     return {"ok": True}
 
 
