@@ -415,12 +415,52 @@ function Home(){
           {inStockProducts.map(p => (
             <div key={p.id} style={{
               background: '#ffffff',
-              border: '2px solid #ff0000',
+              border: '1px solid #e5e7eb',
               borderRadius: '16px',
               padding: '16px',
-              minHeight: '200px'
-            }}>
-              <ProductCard p={p} />
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }} onClick={() => window.location.href = `/products/${p.id}`}>
+              {p.images?.[0] ? (
+                <img 
+                  src={p.images[0].includes('http') ? p.images[0] : `${BACKEND_URL}/uploads/${p.images[0]}`}
+                  alt={p.title}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderRadius: '12px'
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: '100%', 
+                  height: '200px', 
+                  background: '#f3f4f6', 
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#6b7280',
+                  fontSize: '14px'
+                }}>
+                  No Image
+                </div>
+              )}
+              <h4 style={{margin: '12px 0 6px 0', fontSize: '18px', fontWeight: '600'}}>{p.title}</h4>
+              <p style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                lineHeight: '1.4',
+                marginTop: '8px',
+                color: '#4b5563',
+                fontSize: '14px'
+              }}>
+                {p.description}
+              </p>
             </div>
           ))}
         </div>
