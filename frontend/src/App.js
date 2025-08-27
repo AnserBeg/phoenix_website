@@ -19,12 +19,12 @@ const LOGO = `${BACKEND_URL}/uploads/migrated/phoenix_logo_3264f6df.svg`;
 
 // User-provided featured images
 const USER_FEATURED = [
-  { key: 'flatbed-premium', title: "Premium Flatbed", src: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 04_01_19 PM.jpg`, src2: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 03_41_52 PM (1).jpg`, desc: "High-quality flatbed trailer designed for heavy-duty transportation with enhanced durability.", link: "/flatbeds" },
-  { key: 'drop-deck', title: "Drop Deck Ramp", src: `${BACKEND_URL}/uploads/Adobe Express - file.jpg`, src2: `${BACKEND_URL}/uploads/migrated/image_da077c5a.jpg`, desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment loading.", link: "/drop-decks" },
+  { key: 'flatbed-premium', title: "Premium Flatbed", src: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 04_01_19 PM.jpg`, src2: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 03_41_52 PM (1).jpg`, desc: "High-quality flatbed trailer designed for heavy-duty transportation", link: "/flatbeds" },
+  { key: 'drop-deck', title: "Drop Deck Ramp", src: `${BACKEND_URL}/uploads/Adobe Express - file.jpg`, src2: `${BACKEND_URL}/uploads/migrated/image_da077c5a.jpg`, desc: "Tri-axle drop deck with beavertail ramp system for heavy duty equipment", link: "/drop-decks" },
   { key: 'tanks', title: "Flatbed with Tanks", src: `${BACKEND_URL}/uploads/migrated/image_ff2a7939.jpg`, src2: `${BACKEND_URL}/uploads/ChatGPT Image Aug 26, 2025, 02_43_39 PM.jpg`, desc: "Flatbed configuration built to transport vertical tanks with secure strapping.", link: "/custom" },
   { key: 'towable', title: "Towable Screen", src: `${BACKEND_URL}/uploads/migrated/image_06b6a17d.jpg`, desc: "Mobile screen platform with secure mounts and transport-ready chassis.", link: "/custom" },
   { key: 'utility', title: "Utility Trailer", src: `${BACKEND_URL}/uploads/migrated/image_d43cb4b8.jpg`, desc: "Dual-axle utility trailer with stake sides and treated wood deck.", link: "/custom" },
-  { key: 'control-van', title: "Control Van", src: `${BACKEND_URL}/uploads/migrated/image_f595beb2.jpg`, desc: "Operator-ready control van with elevated platform access and power systems.", link: "/control-vans" },
+  { key: 'control-van', title: "Control Van", src: `${BACKEND_URL}/uploads/migrated/image_f595beb2.jpg`, desc: "Operator-ready control van with elevated platform access", link: "/control-vans" },
 ];
 
 // -------------- Reusable helpers --------------
