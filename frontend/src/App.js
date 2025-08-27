@@ -81,12 +81,7 @@ function Shell({ children }){
           </div>
 
           <div className="nav-actions">
-            {/* Desktop: Show main nav links, Mobile: Show hamburger */}
-            <div className="desktop-nav-links">
-              <Link to="/about">About</Link>
-              <Link to="/add">Add Product</Link>
-              <Link to="/login">Login</Link>
-            </div>
+            {/* Desktop: Hamburger shows About/Add/Login, Mobile: Shows everything */}
             <button className="btn secondary small hamburger" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={18}/></button>
           </div>
         </div>
@@ -103,8 +98,15 @@ function Shell({ children }){
             </div>
             <button className="btn secondary small" onClick={()=>setMobileOpen(false)} aria-label="Close"><X size={18}/></button>
           </div>
-          {/* Main Navigation */}
-          <div className="mobile-nav-section">
+          {/* Desktop: Show only About/Add/Login, Mobile: Show everything */}
+          <div className="desktop-only-nav">
+            <Link className="mlink" to="/about" onClick={()=>setMobileOpen(false)}>About</Link>
+            <Link className="mlink" to="/add" onClick={()=>setMobileOpen(false)}>Add Product</Link>
+            <Link className="mlink" to="/login" onClick={()=>setMobileOpen(false)}>Login</Link>
+          </div>
+          
+          {/* Mobile: Show all navigation */}
+          <div className="mobile-only-nav">
             <h4>Main Navigation</h4>
             <Link className="mlink" to="/products" onClick={()=>setMobileOpen(false)}>Products</Link>
             <Link className="mlink" to="/flatbeds" onClick={()=>setMobileOpen(false)}>Flatbeds</Link>
@@ -114,14 +116,6 @@ function Shell({ children }){
             <Link className="mlink" to="/custom" onClick={()=>setMobileOpen(false)}>Custom Builds</Link>
             <Link className="mlink" to="/dealers" onClick={()=>setMobileOpen(false)}>Dealers</Link>
             <Link className="mlink" to="/contact" onClick={()=>setMobileOpen(false)}>Contact</Link>
-          </div>
-          
-          {/* Additional Pages */}
-          <div className="mobile-nav-section">
-            <h4>More</h4>
-            <Link className="mlink" to="/about" onClick={()=>setMobileOpen(false)}>About</Link>
-            <Link className="mlink" to="/add" onClick={()=>setMobileOpen(false)}>Add Product</Link>
-            <Link className="mlink" to="/login" onClick={()=>setMobileOpen(false)}>Login</Link>
           </div>
         </div>
       </div>
@@ -1199,7 +1193,7 @@ function CustomBuilds(){
         <div className="form reveal" style={{marginTop:16, display:'flex', justifyContent:'space-between', gap:12}}>
           <div>
             <h3>Start a custom build</h3>
-            <p className="h-sub">Email <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a> or call (403) 837‑1322</p>
+            <p className="h-sub">Email <a href="mailto:seanm@phoenixtrailers.ca">seanm@phoenixtrailers.ca</a> or call (403) 837‑1322</p>
           </div>
           <Link className="btn" to="/contact">Contact Us</Link>
         </div>
@@ -1271,7 +1265,7 @@ function About(){
         <ul style={{marginTop:8, color:'var(--muted)'}}>
           <li>Sean McCormick — Co-Founder, CEO</li>
           <li>Paul McCormick — Co-Founder</li>
-          <li>Azhar Nizam — Accountant</li>
+                          <li>Azhar Nizam — Controller</li>
           <li>Sales — Coming Soon</li>
         </ul>
       </div>
@@ -1291,7 +1285,7 @@ function Contact(){
               <div><div className="label">Address</div> Phoenix Equipment Sales Ltd. – 6633 86 Ave SE, Calgary AB</div>
               <div><div className="label">Hours</div> Mon–Fri 9:00AM – 5:00PM</div>
               <div><div className="label">Phone</div> 403-837-1322</div>
-              <div><div className="label">Email</div> <a href="mailto:seanm@rpmtrailer.ca">seanm@rpmtrailer.ca</a></div>
+              <div><div className="label">Email</div> <a href="mailto:seanm@phoenixtrailers.ca">seanm@phoenixtrailers.ca</a></div>
             </div>
           </div>
           <div className="form reveal">
