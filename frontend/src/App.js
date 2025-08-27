@@ -677,7 +677,7 @@ function ProductDetail(){
                         {p.images.map((u,i)=> (
               <div key={i} style={{position: 'relative'}}>
                 <OptimizedImage 
-                  src={u} 
+                  src={u.includes('http') ? u : `${BACKEND_URL}/uploads/${u}`} 
                   alt={`${p.title} ${i+1}`} 
                   loading="lazy" // Lazy load images
                   style={{
@@ -745,7 +745,25 @@ function EditProduct(){
   const [images, setImages] = useState([""]);
   const [uploading, setUploading] = useState(false);
   
-  useEffect(()=>{ (async()=>{ try{ const {data}=await api.get(`/products/${id}`); setTitle(data.title); setDescription(data.description); setImages(data.images?.length?data.images:[""]); }catch(e){ console.error(e);} })(); },[id]);
+  useEffect(()=>{ 
+    (async()=>{ 
+      try{ 
+        const {data}=await api.get(`/products/${id}`); 
+        setTitle(data.title); 
+        setDescription(data.description); 
+        // Clean up image URLs to just filenames
+        const cleanImages = data.images?.map(img => {
+          if (img.includes('/uploads/')) {
+            return img.split('/uploads/')[1]; // Extract just the filename
+          }
+          return img;
+        }) || [""];
+        setImages(cleanImages.length ? cleanImages : [""]); 
+      }catch(e){ 
+        console.error(e);
+      } 
+    })(); 
+  },[id]);
   
   const handleFileUpload = async (file, index) => {
     if (!file) return;
@@ -759,9 +777,9 @@ function EditProduct(){
         headers: { ...auth.headers, 'Content-Type': 'multipart/form-data' }
       });
       
-      // Update the image at the specified index with the uploaded file URL
+      // Use the filename from the response and construct the URL using BACKEND_URL
       const newImages = [...images];
-      newImages[index] = response.data.url;
+      newImages[index] = response.data.filename; // Just store the filename, not the full URL
       setImages(newImages);
     } catch (err) {
       alert("Failed to upload image");
@@ -868,9 +886,9 @@ function AddProduct(){
         headers: { ...auth.headers, 'Content-Type': 'multipart/form-data' }
       });
       
-      // Update the image at the specified index with the uploaded file URL
+      // Use the filename from the response and construct the URL using BACKEND_URL
       const newImages = [...images];
-      newImages[index] = response.data.url;
+      newImages[index] = response.data.filename; // Just store the filename, not the full URL
       setImages(newImages);
     } catch (err) {
       alert("Failed to upload image");

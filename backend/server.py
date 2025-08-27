@@ -217,7 +217,8 @@ async def upload_file(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
     
     # Return the full URL to access the file
-    backend_url = "http://localhost:8000"
+    # Use environment variable for backend URL, fallback to localhost for development
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
     return {"filename": unique_filename, "url": f"{backend_url}/uploads/{unique_filename}"}
 
 # Debug endpoint to check uploads directory
