@@ -429,7 +429,7 @@ function Home(){
       </section>
 
       {/* Stock for Sale - Only render when there are products */}
-      {inStockProducts.length > 0 && (
+      {inStockProducts.length > 0 ? (
         <section className="featured container reveal">
           <h2>Stock for Sale</h2>
           <p className="lead">Browse our currently available products</p>
@@ -489,6 +489,17 @@ function Home(){
           <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
               See More Products <ArrowRight size={24} />
+            </Link>
+          </div>
+        </section>
+      ) : (
+        // Simple message when no products
+        <section className="featured container reveal">
+          <h2>Stock for Sale</h2>
+          <p className="lead">No products currently available</p>
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
+              View All Products <ArrowRight size={24} />
             </Link>
           </div>
         </section>
