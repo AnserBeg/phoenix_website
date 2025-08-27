@@ -153,6 +153,11 @@ class ProductCreate(BaseModel):
 async def root():
     return {"message": "Phoenix Trailers API is running"}
 
+@api_router.get("/health")
+async def health_check():
+    """Simple health check endpoint"""
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
@@ -335,29 +340,41 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     """Initialize data on startup"""
-    global users_db, products_db, status_checks_db
-    
-    print("=== Starting Phoenix Trailers API ===")
-    print(f"Data directory: {DATA_DIR.absolute()}")
-    print(f"Users file: {USERS_FILE.absolute()}")
-    print(f"Products file: {PRODUCTS_FILE.absolute()}")
-    print(f"Status file: {STATUS_FILE.absolute()}")
-    
-    # Reload data from files
-    data_manager.load_data()
-    users_db = data_manager.users_db
-    products_db = data_manager.products_db
-    status_checks_db = data_manager.status_checks_db
-    
-    print(f"Loaded {len(users_db)} users")
-    print(f"Loaded {len(products_db)} products")
-    print(f"Loaded {len(status_checks_db)} status checks")
-    
-    # Ensure default user exists and has password hash
-    default_user_email = "seanm@phoenixtrailers.ca"
-    if default_user_email in users_db and not users_db[default_user_email].get("password_hash"):
-        users_db[default_user_email]["password_hash"] = get_password_hash("123")
-        data_manager.save_data()
-        print("Default user password hash updated")
-    
-    print("=== Startup complete ===")
+    try:
+        global users_db, products_db, status_checks_db
+        
+        print("=== Starting Phoenix Trailers API ===")
+        print(f"Data directory: {DATA_DIR.absolute()}")
+        print(f"Users file: {USERS_FILE.absolute()}")
+        print(f"Products file: {PRODUCTS_FILE.absolute()}")
+        print(f"Status file: {STATUS_FILE.absolute()}")
+        
+        # Reload data from files
+        print("Loading data from DataManager...")
+        data_manager.load_data()
+        users_db = data_manager.users_db
+        products_db = data_manager.products_db
+        status_checks_db = data_manager.status_checks_db
+        
+        print(f"Loaded {len(users_db)} users")
+        print(f"Loaded {len(products_db)} products")
+        print(f"Loaded {len(status_checks_db)} status checks")
+        
+        # Ensure default user exists and has password hash
+        default_user_email = "seanm@phoenixtrailers.ca"
+        if default_user_email in users_db and not users_db[default_user_email].get("password_hash"):
+            print("Updating default user password hash...")
+            users_db[default_user_email]["password_hash"] = get_password_hash("123")
+            data_manager.save_data()
+            print("Default user password hash updated")
+        
+        print("=== Startup complete ===")
+        
+    except Exception as e:
+        print(f"❌ Startup error: {e}")
+        import traceback
+        traceback.print_exc()
+        # Don't crash the app, continue with empty data
+        users_db = {}
+        products_db = {}
+        status_checks_db = []
