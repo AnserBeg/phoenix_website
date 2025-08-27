@@ -38,6 +38,16 @@ function useAuth() {
   return { token, setToken, isAuthed, headers };
 }
 
+// Utility function to force elements to be visible
+function forceVisibility(selector) {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(el => {
+    if (el.classList.contains('reveal')) {
+      el.classList.add('is-visible');
+    }
+  });
+}
+
 // Global scroll reveal + page change refresh + scroll to top
 function useScrollAnimations() {
   const location = useLocation();
@@ -306,6 +316,16 @@ function Home(){
     console.log("inStockProducts state changed:", inStockProducts);
     console.log("inStockProducts.length:", inStockProducts.length);
   }, [inStockProducts]);
+
+  // Ensure home page products are visible
+  useEffect(() => {
+    if (inStockProducts.length > 0) {
+      // Force home page product cards to be visible
+      setTimeout(() => {
+        forceVisibility('.featured .grid .reveal');
+      }, 200);
+    }
+  }, [inStockProducts]);
   
   // Manual navigation
   const goToMedia = (index) => {
@@ -554,6 +574,9 @@ function ImgCard({title, src}){
 function Products(){
   const [items, setItems] = useState([]);
   
+  // Debug logging
+  console.log("Products component rendered with items:", items);
+  
   useEffect(() => { 
     (async () => {
       try{ 
@@ -578,6 +601,14 @@ function Products(){
           }
         });
       }, 100);
+    }
+  }, [items]);
+
+  // Additional effect to ensure products are visible immediately
+  useEffect(() => {
+    if (items.length > 0) {
+      // Force all product cards to be visible
+      forceVisibility('.card.reveal');
     }
   }, [items]);
   

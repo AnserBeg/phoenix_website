@@ -111,6 +111,10 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 /* Scroll reveal animations */
 .reveal, .slide-left, .slide-right {opacity:0; transform: translateY(16px);}
 .reveal.is-visible, .slide-left.is-visible, .slide-right.is-visible {opacity:1; transform:none; transition: opacity 600ms ease, transform 600ms ease;}
+
+/* Ensure product cards are visible by default */
+.card.reveal {opacity:1; transform:none;}
+.featured .grid .reveal {opacity:1; transform:none;}
 .slide-left{transform: translateX(-28px);}
 .slide-right{transform: translateX(28px);}
 
