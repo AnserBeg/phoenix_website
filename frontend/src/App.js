@@ -408,74 +408,22 @@ function Home(){
       </section>
 
       {/* In Stock Equipment */}
-      <section className="featured container reveal">
-        <h2>In Stock Equipment</h2>
-        
-        {/* Debug info - remove this later */}
-        <div style={{ 
-          background: '#f0f9ff', 
-          border: '1px solid #0ea5e9', 
-          borderRadius: '8px', 
-          padding: '16px', 
-          marginBottom: '24px',
-          fontSize: '14px'
-        }}>
-          <strong>Debug Info:</strong><br/>
-          Products count: {inStockProducts.length}<br/>
-          Backend URL: {BACKEND_URL}<br/>
-          API URL: {API}<br/>
-          Products: {JSON.stringify(inStockProducts, null, 2)}
+      <div className="section container reveal">
+        <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>In Stock Equipment</h2>
+        <p className="lead">Browse our currently available products</p>
+        <div className="grid" style={{marginTop:16}}>
+          {inStockProducts.map(p => (
+            <ProductCard key={p.id} p={p} />
+          ))}
         </div>
-        
-        {inStockProducts.length > 0 ? (
-          <>
-            <div style={{ 
-              background: '#ecfdf5', 
-              border: '1px solid #10b981', 
-              borderRadius: '8px', 
-              padding: '16px', 
-              marginBottom: '24px',
-              fontSize: '14px'
-            }}>
-              <strong>✅ Products Found - Rendering {inStockProducts.length} product(s):</strong><br/>
-              {inStockProducts.map((p, i) => (
-                <div key={i}>• {p.title} (ID: {p.id})</div>
-              ))}
-            </div>
-            
-            <div className="grid" style={{marginTop:16}}>
-              {inStockProducts.map(p => (
-                <ProductCard key={p.id} p={p} />
-              ))}
-            </div>
-            <div style={{ textAlign: 'center', marginTop: '40px' }}>
-              <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
-                See More Products <ArrowRight size={24} />
-              </Link>
-            </div>
-          </>
-        ) : (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '60px 20px',
-            background: '#fef2f2',
-            borderRadius: '16px',
-            border: '1px solid #f87171'
-          }}>
-            <p style={{ fontSize: '18px', color: '#dc2626', marginBottom: '24px' }}>
-              ❌ No products currently in stock
-            </p>
-            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
-              Debug: inStockProducts.length = {inStockProducts.length}<br/>
-              Debug: inStockProducts type = {typeof inStockProducts}<br/>
-              Debug: inStockProducts value = {JSON.stringify(inStockProducts)}
-            </p>
+        {inStockProducts.length > 0 && (
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
-              Browse All Products <ArrowRight size={24} />
+              See More Products <ArrowRight size={24} />
             </Link>
           </div>
         )}
-      </section>
+      </div>
 
       {/* Featured Products */}
       <section className="featured container reveal">
