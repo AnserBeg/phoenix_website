@@ -413,7 +413,15 @@ function Home(){
         <p className="lead">Browse our currently available products</p>
         <div className="grid" style={{marginTop:16}}>
           {inStockProducts.map(p => (
-            <ProductCard key={p.id} p={p} />
+            <div key={p.id} style={{
+              background: '#ffffff',
+              border: '2px solid #ff0000',
+              borderRadius: '16px',
+              padding: '16px',
+              minHeight: '200px'
+            }}>
+              <ProductCard p={p} />
+            </div>
           ))}
         </div>
         {inStockProducts.length > 0 && (
