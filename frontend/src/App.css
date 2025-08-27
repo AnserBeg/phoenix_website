@@ -189,3 +189,22 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
   .hero-buttons{flex-direction:column; align-items:stretch; gap:12px}
   .hero-buttons .btn{justify-content:center; text-align:center}
 }
+
+/* Mobile Navigation Sections */
+.mobile-nav-section {
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+}
+
+.mobile-nav-section:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

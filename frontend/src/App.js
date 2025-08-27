@@ -59,7 +59,6 @@ function useScrollAnimations() {
 function Shell({ children }){
   useScrollAnimations();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [deskOpen, setDeskOpen] = useState(false);
   return (
     <div className="App">
       <nav className="nav">
@@ -82,16 +81,7 @@ function Shell({ children }){
           </div>
 
           <div className="nav-actions">
-            {/* Desktop dropdown menu */}
-            <div className="desk-menu desk-hamburger">
-              <button className="btn secondary small" onClick={() => setDeskOpen(v=>!v)} aria-label="Open menu"><Menu size={18}/></button>
-              <div className={`dropdown-panel ${deskOpen ? 'open' : ''}`}>
-                <Link className="dropdown-item" to="/about" onClick={()=>setDeskOpen(false)}>About</Link>
-                <Link className="dropdown-item" to="/add" onClick={()=>setDeskOpen(false)}>Add Product</Link>
-                <Link className="dropdown-item" to="/login" onClick={()=>setDeskOpen(false)}>Login</Link>
-              </div>
-            </div>
-            {/* Mobile hamburger */}
+            {/* Single responsive hamburger menu */}
             <button className="btn secondary small hamburger" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={18}/></button>
           </div>
         </div>
@@ -108,17 +98,26 @@ function Shell({ children }){
             </div>
             <button className="btn secondary small" onClick={()=>setMobileOpen(false)} aria-label="Close"><X size={18}/></button>
           </div>
-          <Link className="mlink" to="/products" onClick={()=>setMobileOpen(false)}>Products</Link>
-          <Link className="mlink" to="/flatbeds" onClick={()=>setMobileOpen(false)}>Flatbeds</Link>
-          <Link className="mlink" to="/drop-decks" onClick={()=>setMobileOpen(false)}>Drop Decks</Link>
-          <Link className="mlink" to="/truck-decks" onClick={()=>setMobileOpen(false)}>Truck Decks</Link>
-          <Link className="mlink" to="/control-vans" onClick={()=>setMobileOpen(false)}>Control Vans</Link>
-          <Link className="mlink" to="/custom" onClick={()=>setMobileOpen(false)}>Custom Builds</Link>
-          <Link className="mlink" to="/dealers" onClick={()=>setMobileOpen(false)}>Dealers</Link>
-          <Link className="mlink" to="/about" onClick={()=>setMobileOpen(false)}>About</Link>
-          <Link className="mlink" to="/contact" onClick={()=>setMobileOpen(false)}>Contact</Link>
-          <Link className="mlink" to="/add" onClick={()=>setMobileOpen(false)}>Add Product</Link>
-          <Link className="mlink" to="/login" onClick={()=>setMobileOpen(false)}>Login</Link>
+          {/* Main Navigation */}
+          <div className="mobile-nav-section">
+            <h4>Main Navigation</h4>
+            <Link className="mlink" to="/products" onClick={()=>setMobileOpen(false)}>Products</Link>
+            <Link className="mlink" to="/flatbeds" onClick={()=>setMobileOpen(false)}>Flatbeds</Link>
+            <Link className="mlink" to="/drop-decks" onClick={()=>setMobileOpen(false)}>Drop Decks</Link>
+            <Link className="mlink" to="/truck-decks" onClick={()=>setMobileOpen(false)}>Truck Decks</Link>
+            <Link className="mlink" to="/control-vans" onClick={()=>setMobileOpen(false)}>Control Vans</Link>
+            <Link className="mlink" to="/custom" onClick={()=>setMobileOpen(false)}>Custom Builds</Link>
+            <Link className="mlink" to="/dealers" onClick={()=>setMobileOpen(false)}>Dealers</Link>
+            <Link className="mlink" to="/contact" onClick={()=>setMobileOpen(false)}>Contact</Link>
+          </div>
+          
+          {/* Additional Pages */}
+          <div className="mobile-nav-section">
+            <h4>More</h4>
+            <Link className="mlink" to="/about" onClick={()=>setMobileOpen(false)}>About</Link>
+            <Link className="mlink" to="/add" onClick={()=>setMobileOpen(false)}>Add Product</Link>
+            <Link className="mlink" to="/login" onClick={()=>setMobileOpen(false)}>Login</Link>
+          </div>
         </div>
       </div>
 
