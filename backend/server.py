@@ -345,9 +345,7 @@ async def startup_event():
         
         print("=== Starting Phoenix Trailers API ===")
         print(f"Data directory: {DATA_DIR.absolute()}")
-        print(f"Users file: {USERS_FILE.absolute()}")
-        print(f"Products file: {PRODUCTS_FILE.absolute()}")
-        print(f"Status file: {STATUS_FILE.absolute()}")
+        print(f"DataManager files: {data_manager.users_file}, {data_manager.products_file}, {data_manager.status_file}")
         
         # Reload data from files
         print("Loading data from DataManager...")
