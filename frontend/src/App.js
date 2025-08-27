@@ -189,12 +189,10 @@ function ToggleImageCard({ item }) {
             />
           </div>
         </div>
-      <div className="featured-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div style={{ flex: 1 }}>
-          <h3>{item.title}</h3>
-          <p>{item.desc}</p>
-        </div>
-        <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+      <div className="featured-content">
+        <h3>{item.title}</h3>
+        <p>{item.desc}</p>
+        <div style={{ marginTop: '16px' }}>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <Link to={item.link} className="btn btn-outline">
               Learn More <ArrowRight size={16} />
@@ -491,12 +489,10 @@ function Home(){
                   alt={item.title}
                   loading="lazy" // Lazy load images
                 />
-                <div className="featured-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <div style={{ flex: 1 }}>
-                    <h3>{item.title}</h3>
-                    <p>{item.desc}</p>
-                  </div>
-                  <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+                <div className="featured-content">
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                  <div style={{ marginTop: '16px' }}>
                     <Link to={item.link} className="btn btn-outline">
                       Learn More <ArrowRight size={16} />
                     </Link>
