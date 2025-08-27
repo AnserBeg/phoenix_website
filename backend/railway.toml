@@ -13,6 +13,8 @@ NODE_ENV = "production"
 # Add environment variables for better data handling
 DATA_PERSISTENCE = "true"
 BACKUP_DATA_ON_STARTUP = "true"
+# CORS configuration for frontend access
+CORS_ORIGINS = "https://web.phoenixtrailers.ca,https://phoenixtrailers.ca,http://localhost:3000"
 
 # Specify the source directory for Railway
 [source]

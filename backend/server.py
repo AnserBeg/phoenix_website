@@ -18,7 +18,30 @@ UPLOADS_DIR = Path(__file__).parent / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
 
 # Import the DataManager
-from data_manager import DataManager
+try:
+    from data_manager import DataManager
+    print("DataManager imported successfully")
+except ImportError as e:
+    print(f"Error importing DataManager: {e}")
+    # Fallback to basic JSON handling
+    import json
+    from pathlib import Path
+    
+    class DataManager:
+        def __init__(self, data_dir):
+            self.data_dir = data_dir
+            self.users_db = {}
+            self.products_db = {}
+            self.status_checks_db = []
+        
+        def load_data(self):
+            pass
+        
+        def save_data(self):
+            pass
+        
+        def get_data_summary(self):
+            return {"error": "DataManager not available"}
 
 # Initialize DataManager
 DATA_DIR = Path(__file__).parent / "data"
@@ -74,9 +97,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-# Initialize default user password hash
-default_user["password_hash"] = get_password_hash("123")
-print("Default user created: seanm@phoenixtrailers.ca / 123")
+# Initialize default user password hash - moved to startup event
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -275,10 +296,18 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR.absolute())), name="
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # CORS
+cors_origins = os.environ.get('CORS_ORIGINS', '*')
+if cors_origins != '*':
+    cors_origins = cors_origins.split(',')
+else:
+    cors_origins = ['*']
+
+print(f"CORS origins configured: {cors_origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -315,9 +344,10 @@ async def startup_event():
     print(f"Status file: {STATUS_FILE.absolute()}")
     
     # Reload data from files
-    users_db = load_json_data(USERS_FILE)
-    products_db = load_json_data(PRODUCTS_FILE)
-    status_checks_db = load_json_data(STATUS_FILE)
+    data_manager.load_data()
+    users_db = data_manager.users_db
+    products_db = data_manager.products_db
+    status_checks_db = data_manager.status_checks_db
     
     print(f"Loaded {len(users_db)} users")
     print(f"Loaded {len(products_db)} products")
