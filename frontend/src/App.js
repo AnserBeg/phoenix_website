@@ -296,6 +296,12 @@ function Home(){
       } 
     })(); 
   }, []);
+
+  // Debug: Log when inStockProducts state changes
+  useEffect(() => {
+    console.log("inStockProducts state changed:", inStockProducts);
+    console.log("inStockProducts.length:", inStockProducts.length);
+  }, [inStockProducts]);
   
   // Manual navigation
   const goToMedia = (index) => {
@@ -423,6 +429,20 @@ function Home(){
         
         {inStockProducts.length > 0 ? (
           <>
+            <div style={{ 
+              background: '#ecfdf5', 
+              border: '1px solid #10b981', 
+              borderRadius: '8px', 
+              padding: '16px', 
+              marginBottom: '24px',
+              fontSize: '14px'
+            }}>
+              <strong>✅ Products Found - Rendering {inStockProducts.length} product(s):</strong><br/>
+              {inStockProducts.map((p, i) => (
+                <div key={i}>• {p.title} (ID: {p.id})</div>
+              ))}
+            </div>
+            
             <div className="featured-grid">
               {inStockProducts.map((product) => (
                 <div key={product.id} className="featured-item reveal">
@@ -477,12 +497,17 @@ function Home(){
           <div style={{ 
             textAlign: 'center', 
             padding: '60px 20px',
-            background: '#f9fafb',
+            background: '#fef2f2',
             borderRadius: '16px',
-            border: '1px solid #e5e7eb'
+            border: '1px solid #f87171'
           }}>
-            <p style={{ fontSize: '18px', color: '#6b7280', marginBottom: '24px' }}>
-              No products currently in stock
+            <p style={{ fontSize: '18px', color: '#dc2626', marginBottom: '24px' }}>
+              ❌ No products currently in stock
+            </p>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+              Debug: inStockProducts.length = {inStockProducts.length}<br/>
+              Debug: inStockProducts type = {typeof inStockProducts}<br/>
+              Debug: inStockProducts value = {JSON.stringify(inStockProducts)}
             </p>
             <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
               Browse All Products <ArrowRight size={24} />
