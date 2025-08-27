@@ -10,6 +10,9 @@ restartPolicyMaxRetries = 3
 
 [deploy.envs]
 NODE_ENV = "production"
+# Add environment variables for better data handling
+DATA_PERSISTENCE = "true"
+BACKUP_DATA_ON_STARTUP = "true"
 
 # Specify the source directory for Railway
 [source]

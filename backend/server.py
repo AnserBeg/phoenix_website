@@ -17,48 +17,40 @@ import shutil
 UPLOADS_DIR = Path(__file__).parent / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
 
-# Persistent storage using JSON files
-import json
+# Import the DataManager
+from data_manager import DataManager
 
-# File paths for persistent storage
+# Initialize DataManager
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
-USERS_FILE = DATA_DIR / "users.json"
-PRODUCTS_FILE = DATA_DIR / "products.json"
-STATUS_FILE = DATA_DIR / "status.json"
+data_manager = DataManager(DATA_DIR)
 
-def load_json_data(file_path):
-    """Load data from JSON file"""
-    if file_path.exists():
-        try:
-            with open(file_path, 'r') as f:
-                return json.load(f)
-        except:
-            return {}
-    return {}
+# DataManager will handle data loading
 
-def save_json_data(file_path, data):
-    """Save data to JSON file"""
-    try:
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2, default=str)
-    except Exception as e:
-        print(f"Error saving to {file_path}: {e}")
+# DataManager will handle data saving
 
 # Load existing data or create empty storage
-users_db = load_json_data(USERS_FILE)
-products_db = load_json_data(PRODUCTS_FILE)
-status_checks_db = load_json_data(STATUS_FILE)
+data_manager.load_data()
+users_db = data_manager.users_db
+products_db = data_manager.products_db
+status_checks_db = data_manager.status_checks_db
 
-# Create default user
-default_user = {
-    "id": str(uuid.uuid4()),
-    "email": "seanm@phoenixtrailers.ca",
-    "password_hash": None,  # Will be set when password hashing is initialized
-    "created_at": datetime.utcnow(),
-}
-users_db[default_user["email"]] = default_user
+# Create default user if not exists
+default_user_email = "seanm@phoenixtrailers.ca"
+if default_user_email not in users_db:
+    default_user = {
+        "id": str(uuid.uuid4()),
+        "email": default_user_email,
+        "password_hash": None,  # Will be set when password hashing is initialized
+        "created_at": datetime.utcnow(),
+    }
+    users_db[default_user_email] = default_user
+    # Save immediately to ensure persistence
+    data_manager.save_data()
+    print(f"Default user created: {default_user_email}")
+else:
+    print(f"Default user already exists: {default_user_email}")
 
 # Create the main app without a prefix
 app = FastAPI(title="Phoenix Trailers API")
@@ -145,7 +137,7 @@ async def root():
 async def create_status_check(input: StatusCheckCreate):
     status_obj = StatusCheck(**input.dict())
     status_checks_db.append(status_obj.dict())
-    save_json_data(STATUS_FILE, status_checks_db)
+    data_manager.save_data()
     return status_obj
 
 
@@ -166,7 +158,7 @@ async def register(payload: UserCreate):
         "created_at": datetime.utcnow(),
     }
     users_db[payload.email] = user
-    save_json_data(USERS_FILE, users_db)
+    data_manager.save_data()
     token = create_access_token({"sub": user["id"], "email": user["email"]})
     return TokenResponse(access_token=token)
 
@@ -214,7 +206,7 @@ async def get_product(product_id: str):
 async def create_product(product: ProductCreate, user=Depends(require_auth)):
     prod = Product(**product.dict())
     products_db[prod.id] = prod.dict()
-    save_json_data(PRODUCTS_FILE, products_db)
+    data_manager.save_data()
     return prod
 
 
@@ -225,7 +217,7 @@ async def update_product(product_id: str, product: ProductCreate, user=Depends(r
     now = datetime.utcnow()
     update_doc = {**product.dict(), "id": product_id, "updated_at": now}
     products_db[product_id] = update_doc
-    save_json_data(PRODUCTS_FILE, products_db)
+    data_manager.save_data()
     return Product(**update_doc)
 
 
@@ -234,7 +226,7 @@ async def delete_product(product_id: str, user=Depends(require_auth)):
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
     del products_db[product_id]
-    save_json_data(PRODUCTS_FILE, products_db)
+    data_manager.save_data()
     return {"ok": True}
 
 
@@ -265,6 +257,12 @@ async def debug_uploads():
         "files": [f.name for f in files if f.is_file()],
         "directories": [f.name for f in files if f.is_dir()]
     }
+
+# Debug endpoint to check data storage
+@api_router.get("/debug/data")
+async def debug_data():
+    """Debug endpoint to check the current state of data storage"""
+    return data_manager.get_data_summary()
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -304,4 +302,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# No startup/shutdown events needed for in-memory storage
+# Startup event to ensure data is properly loaded
+@app.on_event("startup")
+async def startup_event():
+    """Initialize data on startup"""
+    global users_db, products_db, status_checks_db
+    
+    print("=== Starting Phoenix Trailers API ===")
+    print(f"Data directory: {DATA_DIR.absolute()}")
+    print(f"Users file: {USERS_FILE.absolute()}")
+    print(f"Products file: {PRODUCTS_FILE.absolute()}")
+    print(f"Status file: {STATUS_FILE.absolute()}")
+    
+    # Reload data from files
+    users_db = load_json_data(USERS_FILE)
+    products_db = load_json_data(PRODUCTS_FILE)
+    status_checks_db = load_json_data(STATUS_FILE)
+    
+    print(f"Loaded {len(users_db)} users")
+    print(f"Loaded {len(products_db)} products")
+    print(f"Loaded {len(status_checks_db)} status checks")
+    
+    # Ensure default user exists and has password hash
+    default_user_email = "seanm@phoenixtrailers.ca"
+    if default_user_email in users_db and not users_db[default_user_email].get("password_hash"):
+        users_db[default_user_email]["password_hash"] = get_password_hash("123")
+        data_manager.save_data()
+        print("Default user password hash updated")
+    
+    print("=== Startup complete ===")
