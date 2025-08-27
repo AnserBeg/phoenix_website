@@ -1046,7 +1046,7 @@ function Flatbeds(){
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <Trailer3DViewer 
             key="flatbeds-3d"
-            modelPath={`${BACKEND_URL}/uploads/1b6e11f42215726e1c34833c13101abe.glb`}
+            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_1b6e11f42215726e1c34833c13101abe.glb`}
             width={500}
             height={250}
             zoom={5.0}
@@ -1084,7 +1084,7 @@ function DropDecks(){
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <Trailer3DViewer 
             key="dropdecks-3d"
-            modelPath={`${BACKEND_URL}/uploads/dropdeck3d.glb`}
+            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_dropdeck3d.glb`}
             width={500}
             height={250}
             zoom={5.0}
@@ -1114,7 +1114,7 @@ function TruckDecks(){
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <Trailer3DViewer 
             key="truckdecks-3d"
-            modelPath={`${BACKEND_URL}/uploads/2b562ac159eb3c6a12abc4e72e677896.glb`}
+            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_2b562ac159eb3c6a12abc4e72e677896.glb`}
             width={500}
             height={250}
             zoom={3.5}
@@ -1149,7 +1149,7 @@ function ControlVans(){
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <Trailer3DViewer 
             key="controlvans-3d"
-            modelPath={`${BACKEND_URL}/uploads/controlvan3d2.glb`}
+            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_controlvan3d2.glb`}
             width={500}
             height={250}
             zoom={5.0}
