@@ -38,10 +38,14 @@ function useAuth() {
   return { token, setToken, isAuthed, headers };
 }
 
-// Global scroll reveal + page change refresh
+// Global scroll reveal + page change refresh + scroll to top
 function useScrollAnimations() {
   const location = useLocation();
   useEffect(() => {
+    // Scroll to top when page changes
+    window.scrollTo(0, 0);
+    
+    // Refresh scroll animations
     const els = document.querySelectorAll('.reveal, .slide-left, .slide-right');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
