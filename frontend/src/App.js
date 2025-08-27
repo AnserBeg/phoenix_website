@@ -289,9 +289,12 @@ function Home(){
       try { 
         console.log("Fetching in-stock products...");
         console.log("API endpoint:", `${API}/products`);
+        console.log("Current inStockProducts state:", inStockProducts);
         
         const {data} = await api.get("/products"); 
         console.log("Products loaded:", data);
+        console.log("Data type:", typeof data);
+        console.log("Is array:", Array.isArray(data));
         
         // Check if data is an array
         if (Array.isArray(data)) {
@@ -332,6 +335,10 @@ function Home(){
     setCurrentMediaIndex(index);
     setIsTransitioning(false);
   };
+
+  // Debug log before render
+  console.log("Home component render - inStockProducts:", inStockProducts);
+  console.log("Home component render - inStockProducts.length:", inStockProducts.length);
 
   return (
     <Shell>
@@ -432,7 +439,7 @@ function Home(){
       </section>
 
       {/* Stock for Sale - Only render when there are products */}
-      {inStockProducts.length > 0 && (
+      {inStockProducts.length > 0 ? (
         <section className="featured container reveal">
           <h2>Stock for Sale</h2>
           <p className="lead">Browse our currently available products</p>
@@ -493,6 +500,23 @@ function Home(){
             <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
               See More Products <ArrowRight size={24} />
             </Link>
+          </div>
+        </section>
+      ) : (
+        // Debug section to show what's happening
+        <section className="featured container reveal">
+          <h2>Debug: Products Status</h2>
+          <div style={{
+            background: '#f3f4f6',
+            border: '1px solid #e5e7eb',
+            borderRadius: '16px',
+            padding: '20px',
+            textAlign: 'center'
+          }}>
+            <p><strong>inStockProducts length:</strong> {inStockProducts.length}</p>
+            <p><strong>inStockProducts type:</strong> {Array.isArray(inStockProducts) ? 'Array' : typeof inStockProducts}</p>
+            <p><strong>inStockProducts value:</strong> {JSON.stringify(inStockProducts, null, 2)}</p>
+            <p><strong>API endpoint:</strong> {API}/products</p>
           </div>
         </section>
       )}
