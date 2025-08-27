@@ -443,48 +443,9 @@ function Home(){
               ))}
             </div>
             
-            <div className="featured-grid">
-              {inStockProducts.map((product) => (
-                <div key={product.id} className="featured-item reveal">
-                  {product.images && product.images.length > 0 ? (
-                    <OptimizedImage 
-                      src={product.images[0].includes('http') ? product.images[0] : `${BACKEND_URL}/uploads/${product.images[0]}`}
-                      alt={product.title}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div style={{ 
-                      width: '100%', 
-                      height: '200px', 
-                      background: '#f3f4f6', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      color: '#6b7280'
-                    }}>
-                      No Image
-                    </div>
-                  )}
-                  <div className="featured-content">
-                    <h3>{product.title}</h3>
-                    <p style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      lineHeight: '1.4',
-                      marginBottom: '16px',
-                      color: 'var(--muted)',
-                      fontSize: '14px'
-                    }}>
-                      {product.description}
-                    </p>
-                    <Link to={`/products/${product.id}`} className="btn btn-outline">
-                      View Details <ArrowRight size={16} />
-                    </Link>
-                  </div>
-                </div>
+            <div className="grid" style={{marginTop:16}}>
+              {inStockProducts.map(p => (
+                <ProductCard key={p.id} p={p} />
               ))}
             </div>
             <div style={{ textAlign: 'center', marginTop: '40px' }}>
