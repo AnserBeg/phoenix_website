@@ -202,15 +202,20 @@ async def login(payload: UserLogin):
 from fastapi import Header
 
 async def require_auth(authorization: Optional[str] = Header(None)):
+    print(f"🔐 Auth check - Authorization header: {authorization}")
     if not authorization:
+        print("❌ No authorization header")
         raise HTTPException(status_code=401, detail="Missing Authorization header")
     try:
         scheme, token = authorization.split(" ", 1)
         if scheme.lower() != "bearer":
+            print(f"❌ Invalid scheme: {scheme}")
             raise ValueError("Invalid scheme")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(f"✅ Auth successful for user: {payload.get('email', 'unknown')}")
         return payload
-    except Exception:
+    except Exception as e:
+        print(f"❌ Auth failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
@@ -230,9 +235,11 @@ async def get_product(product_id: str):
 
 @api_router.post("/products", response_model=Product)
 async def create_product(product: ProductCreate, user=Depends(require_auth)):
+    print(f"🆕 Creating product: {product.title} by user: {user.get('email', 'unknown')}")
     prod = Product(**product.dict())
     products_db[prod.id] = prod.dict()
     data_manager.save_data()
+    print(f"✅ Product created successfully: {prod.id}")
     return prod
 
 

@@ -314,12 +314,6 @@ function Home(){
     })(); 
   }, []);
 
-  // Debug: Log when inStockProducts state changes
-  useEffect(() => {
-    console.log("inStockProducts state changed:", inStockProducts);
-    console.log("inStockProducts.length:", inStockProducts.length);
-  }, [inStockProducts]);
-
   // Ensure home page products are visible
   useEffect(() => {
     if (inStockProducts.length > 0) {
@@ -336,11 +330,7 @@ function Home(){
     setIsTransitioning(false);
   };
 
-  // Debug log before render
-  console.log("Home component render - inStockProducts:", inStockProducts);
-  console.log("Home component render - inStockProducts.length:", inStockProducts.length);
-
-  return (
+    return (
     <Shell>
       {/* <ThreeDBackground style={{
         position: 'fixed',
