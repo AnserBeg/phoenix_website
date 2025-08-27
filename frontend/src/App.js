@@ -429,7 +429,7 @@ function Home(){
       </section>
 
       {/* Stock for Sale - Only render when there are products */}
-      {inStockProducts.length > 0 ? (
+      {inStockProducts.length > 0 && (
         <section className="featured container reveal">
           <h2>Stock for Sale</h2>
           <p className="lead">Browse our currently available products</p>
@@ -490,23 +490,6 @@ function Home(){
             <Link to="/products" className="btn btn-primary" style={{ fontSize: '18px', padding: '16px 32px' }}>
               See More Products <ArrowRight size={24} />
             </Link>
-          </div>
-        </section>
-      ) : (
-        // Debug section to show what's happening
-        <section className="featured container reveal">
-          <h2>Debug: Products Status</h2>
-          <div style={{
-            background: '#f3f4f6',
-            border: '1px solid #e5e7eb',
-            borderRadius: '16px',
-            padding: '20px',
-            textAlign: 'center'
-          }}>
-            <p><strong>inStockProducts length:</strong> {inStockProducts.length}</p>
-            <p><strong>inStockProducts type:</strong> {Array.isArray(inStockProducts) ? 'Array' : typeof inStockProducts}</p>
-            <p><strong>inStockProducts value:</strong> {JSON.stringify(inStockProducts, null, 2)}</p>
-            <p><strong>API endpoint:</strong> {API}/products</p>
           </div>
         </section>
       )}
