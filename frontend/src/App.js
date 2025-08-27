@@ -81,7 +81,12 @@ function Shell({ children }){
           </div>
 
           <div className="nav-actions">
-            {/* Single responsive hamburger menu */}
+            {/* Desktop: Show main nav links, Mobile: Show hamburger */}
+            <div className="desktop-nav-links">
+              <Link to="/about">About</Link>
+              <Link to="/add">Add Product</Link>
+              <Link to="/login">Login</Link>
+            </div>
             <button className="btn secondary small hamburger" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={18}/></button>
           </div>
         </div>

@@ -34,6 +34,25 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .desk-hamburger{display:inline-flex; align-items:center; gap:6px}
 .hamburger{display:none}
 
+/* Desktop navigation links */
+.desktop-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.desktop-nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.desktop-nav-links a:hover {
+  color: var(--brand);
+}
+
 /* Dropdown (desktop) */
 .desk-menu{position:relative}
 .dropdown-panel{position:absolute; right:0; top:44px; background:var(--panel); border:1px solid var(--border); border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,0.08); padding:8px; display:none; min-width:220px}
@@ -42,11 +61,11 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .dropdown-item:hover{background:#f3f4f6}
 
 /* Mobile drawer */
-.mobile-menu{position:fixed; inset:0; background:rgba(15,20,26,0.4); display:none}
+.mobile-menu{position:fixed; inset:0; background:rgba(15,20,26,0.4); display:none; z-index:1000}
 .mobile-menu.open{display:block}
-.mobile-drawer{position:absolute; right:0; top:0; height:100%; width:300px; max-width:90vw; background:var(--panel); border-left:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:12px}
-.mobile-head{display:flex; align-items:center; justify-content:space-between}
-.mlink{padding:10px 8px; border-radius:10px; color:var(--text); text-decoration:none}
+.mobile-drawer{position:absolute; right:0; top:0; height:100%; width:300px; max-width:90vw; background:var(--panel); border-left:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto}
+.mobile-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+.mlink{padding:10px 8px; border-radius:10px; color:var(--text); text-decoration:none; display:block; width:100%}
 .mlink:hover{background:#f3f4f6}
 
 /* Hero with background image overlay (kept dark for contrast) */
@@ -173,6 +192,7 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 @media (max-width: 960px){
   .nav-links{display:none}
   .hamburger{display:inline-flex}
+  .desktop-nav-links{display:none}
   .desk-hamburger{display:none !important}
   .grid{grid-template-columns:1fr 1fr}
   .gallery{grid-template-columns:1fr 1fr}
@@ -194,6 +214,9 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
 .mobile-nav-section {
   border-bottom: 1px solid var(--border);
   padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .mobile-nav-section:last-child {
@@ -207,4 +230,8 @@ body{background:var(--bg); color:var(--text); font-family:Montserrat, system-ui,
   margin: 0 0 12px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.mobile-nav-section .mlink {
+  margin: 0;
 }
