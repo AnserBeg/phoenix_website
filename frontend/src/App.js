@@ -189,28 +189,32 @@ function ToggleImageCard({ item }) {
             />
           </div>
         </div>
-      <div className="featured-content">
-        <h3>{item.title}</h3>
-        <p>{item.desc}</p>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Link to={item.link} className="btn btn-outline">
-            Learn More <ArrowRight size={16} />
-          </Link>
-          <button 
-            onClick={handleToggle}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '8px',
-              border: '1px solid #e5e7eb',
-              background: '#fff',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#374151'
-            }}
-          >
-            {showingSecond ? 'View 1' : 'View 2'}
-          </button>
+      <div className="featured-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ flex: 1 }}>
+          <h3>{item.title}</h3>
+          <p>{item.desc}</p>
+        </div>
+        <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <Link to={item.link} className="btn btn-outline">
+              Learn More <ArrowRight size={16} />
+            </Link>
+            <button 
+              onClick={handleToggle}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb',
+                background: '#fff',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151'
+              }}
+            >
+              {showingSecond ? 'View 1' : 'View 2'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -487,12 +491,16 @@ function Home(){
                   alt={item.title}
                   loading="lazy" // Lazy load images
                 />
-                <div className="featured-content">
-                  <h3>{item.title}</h3>
-                  <p>{item.desc}</p>
-                  <Link to={item.link} className="btn btn-outline">
-                    Learn More <ArrowRight size={16} />
-                  </Link>
+                <div className="featured-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div style={{ flex: 1 }}>
+                    <h3>{item.title}</h3>
+                    <p>{item.desc}</p>
+                  </div>
+                  <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+                    <Link to={item.link} className="btn btn-outline">
+                      Learn More <ArrowRight size={16} />
+                    </Link>
+                  </div>
                 </div>
               </div>
             )
@@ -1049,7 +1057,7 @@ function Flatbeds(){
             modelPath={`${BACKEND_URL}/uploads/ultra_compressed_models/ultra_flatbed3d.glb`}
             width={500}
             height={250}
-            zoom={1.0}
+            zoom={1.5}
           />
         </div>
         
@@ -1114,7 +1122,7 @@ function TruckDecks(){
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
           <Trailer3DViewer 
             key="truckdecks-3d"
-            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_1b6e11f42215726e1c34833c13101abe.glb`}
+            modelPath={`${BACKEND_URL}/uploads/compressed_3d_models/compressed_22c1994d-b40a-43b3-898b-4dcf2d2d5801_white_mesh1.glb`}
             width={500}
             height={250}
             zoom={1.0}
